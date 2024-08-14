@@ -11,7 +11,8 @@ Imports:
     dplyr,
     arrow,
     data.table,
-    rollRCPP
+    rollRCPP,
+    lubridate
 Suggests:
     covr,
     knitr,
