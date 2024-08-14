@@ -22,7 +22,7 @@ read_csv_with_dates <- function(file_path, date_column, date_format) {
   }
   
   # Read in the CSV file
-  df <- read.csv(file_path, stringsAsFactors = FALSE)
+  df <- data.table::fread(file_path)
   
   # Check if the date column exists
   if (!(date_column %in% colnames(df))) {
@@ -30,6 +30,7 @@ read_csv_with_dates <- function(file_path, date_column, date_format) {
   }
   
   # Convert the date column to Date type
+  # using base R for now, this will have to switch to lubridate at some point
   df[[date_column]] <- as.Date(df[[date_column]], format = date_format)
   
   # Check if there are any NA values after conversion
@@ -44,6 +45,7 @@ read_csv_with_dates <- function(file_path, date_column, date_format) {
   cat("Date Column Summary:\n")
   print(summary(df[[date_column]]))
   
+  # save parquet goes here
   # Return the data frame
   return(df)
 }
