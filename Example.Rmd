@@ -1,0 +1,81 @@
+
+---
+title: "0 Time Correction"
+output: html_document
+date: "2024-07-24"
+---
+
+```{r}
+devtools::load_all()
+library(dplyr)
+library(tictoc)
+```
+
+Read file
+Compare speed
+```{r}
+file <- "data-raw/data.csv"
+
+## Read and Convert to parquet
+dat_raw <- 
+    read_csv_with_dates(file, "Timestamp", "%d/%m/%Y %H:%M:%S")
+
+## Load 
+dat_raw <- 
+    arrow::read_parquet("data-raw/data.parquet")  |>
+  na.omit() |>
+  rename(x = accX, y = accY, z = accZ)
+```
+
+# Rewrite `doAccloop`
+
+```{r}
+doAccloop2 <- function(data) { # Creates a training or test matrix, from data frame x, using a sample of size n (default is all rows)			
+  data |>
+    mutate(
+      across(c("x", "y", "z"), list(abs = abs), .names = "{.fn}_{.col}"),
+      
+      ##Overall and Vectorial Dynamic Body Acceleration
+      
+      ODBA = abs_x + abs_y + abs_z,
+      VDBA = sqrt(x^2+y^2+z^2) 
+    ) |>
+    
+    summarise(
+      n = n(),
+      time = mean(datenum),
+      
+      # apply a series of functions to x,y,z vars  
+      across(c("x", "y", "z"), 
+             list(mean = mean, max = max, min = min, 
+                  sd = sd, sk = skewness, 
+                  ku = kurtosis), 
+             .names = "{.fn}{.col}"),
+      # apply a series of functions to ODBA, VDBA vars  
+       across(c("ODBA", "VDBA"), 
+             list(sum = sum, max = max, min = min), 
+             .names = "{.fn}{.col}"),
+      
+      # Signal Magnitude Area
+      SMA = (sum(abs_x) + sum(abs_y) + sum(abs_z))/n,
+  
+      # Correlation between axes
+      corXY = cor(x,y),
+      corXZ = cor(x,z),
+      corYZ = cor(y,z)
+    )
+}
+
+dat_raw |>
+  slice(1:1000) |>
+  doAccloop2()
+```
+
+But these are rolling means! Doing it this way is wildly inefficient.
+
+Suggest writing function in Rcpp (c++ for speed). Can either use existing packages
+
+- RcppRoll: https://cran.r-project.org/web/packages/RcppRoll/index.html
+- write custom function: e.g.
+  - https://stackoverflow.com/questions/54581302/techniques-to-speed-up-rollapply-with-custom-function-r
+  - https://stackoverflow.com/questions/30090336/why-is-zoorollmean-slow-compared-to-a-simple-rcpp-implementation

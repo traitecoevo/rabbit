@@ -8,6 +8,7 @@
 #' @param date_column A string representing the name of the date column in the CSV file.
 #' @param date_format A string representing the expected format of the date column (e.g., "%Y-%m-%d").
 #' @param ... Other arguments to pass into \code{read_csv_with_dates}
+#' @param output_file path of output file
 #' @rdname read_csv_with_dates
 #' @return A data frame containing the CSV data, with the date column converted to Date type.
 #' @export
@@ -16,7 +17,7 @@
 #' \dontrun{
 #'   df <- read_csv_with_dates("data.csv", "date", "%Y-%m-%d")
 #' }
-read_csv_with_dates <- function(file_path, date_column, date_format, ...) {
+read_csv_with_dates <- function(file_path, date_column, date_format, output_file = gsub(".csv", ".parquet", file_path, fixed = TRUE), ...) {
   # Check if the file exists
   if (!file.exists(file_path)) {
     stop("The file does not exist.")
@@ -47,6 +48,10 @@ read_csv_with_dates <- function(file_path, date_column, date_format, ...) {
   print(summary(df[[date_column]]))
   
   # save parquet goes here
+  arrow::write_parquet(df, output_file)
+  cat("File saved as parquet format for future use:", output_file, "\n")
+  
   # Return the data frame
   return(df)
 }
+
