@@ -5,18 +5,23 @@
 \title{Save a CSV or TSV file in parquet format}
 \usage{
 convert_to_parquet(
-  file,
-  output_file = gsub(".csv", ".parquet", file, fixed = TRUE),
-  delim = "\\t"
+  file_path,
+  output_file = gsub(".csv", ".parquet", file_path, fixed = TRUE),
+  ...
 )
 }
 \arguments{
-\item{file}{path of input file}
+\item{file_path}{A string representing the path to the CSV file.}
 
 \item{output_file}{path of output file}
 
-\item{delim}{delimiter (default = "\t")}
+\item{...}{Other arguments to pass into \code{read_csv_with_dates}}
 }
 \description{
 Save a CSV or TSV file in parquet format
+}
+\examples{
+\dontrun{
+  df <- convert_to_parquet("data.csv")
+}
 }

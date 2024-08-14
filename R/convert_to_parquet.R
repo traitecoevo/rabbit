@@ -1,12 +1,15 @@
 #' Save a CSV or TSV file in parquet format
 #'
-#' @param file path of input file
 #' @param output_file path of output file
-#' @param delim delimiter (default = "\t")
+#' @inheritParams read_csv_with_dates
 #'
 #' @export
 #'
 #' @examples
-convert_to_parquet <- function(file, output_file = gsub(".csv", ".parquet", file, fixed = TRUE), delim="\t"){
-  file |> readr::read_delim(delim=delim) |> arrow::write_parquet(output_file)
+#' \dontrun{
+#'   df <- convert_to_parquet("data.csv")
+#' }
+convert_to_parquet <- function(file_path, output_file = gsub(".csv", ".parquet", file_path, fixed = TRUE), ...){
+  
+  file_path |> read_csv_with_dates(...) |> arrow::write_parquet(output_file)
 }

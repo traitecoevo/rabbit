@@ -4,7 +4,7 @@
 \alias{read_csv_with_dates}
 \title{Read CSV with Date Checking and Summary Stats}
 \usage{
-read_csv_with_dates(file_path, date_column, date_format)
+read_csv_with_dates(file_path, date_column, date_format, ...)
 }
 \arguments{
 \item{file_path}{A string representing the path to the CSV file.}
@@ -12,6 +12,8 @@ read_csv_with_dates(file_path, date_column, date_format)
 \item{date_column}{A string representing the name of the date column in the CSV file.}
 
 \item{date_format}{A string representing the expected format of the date column (e.g., "\%Y-\%m-\%d").}
+
+\item{...}{Other arguments to pass into \code{read_csv_with_dates}}
 }
 \value{
 A data frame containing the CSV data, with the date column converted to Date type.

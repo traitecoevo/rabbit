@@ -7,7 +7,8 @@
 #' @param file_path A string representing the path to the CSV file.
 #' @param date_column A string representing the name of the date column in the CSV file.
 #' @param date_format A string representing the expected format of the date column (e.g., "%Y-%m-%d").
-#' 
+#' @param ... Other arguments to pass into \code{read_csv_with_dates}
+#' @rdname read_csv_with_dates
 #' @return A data frame containing the CSV data, with the date column converted to Date type.
 #' @export
 #'
@@ -15,14 +16,14 @@
 #' \dontrun{
 #'   df <- read_csv_with_dates("data.csv", "date", "%Y-%m-%d")
 #' }
-read_csv_with_dates <- function(file_path, date_column, date_format) {
+read_csv_with_dates <- function(file_path, date_column, date_format, ...) {
   # Check if the file exists
   if (!file.exists(file_path)) {
     stop("The file does not exist.")
   }
   
   # Read in the CSV file
-  df <- data.table::fread(file_path)
+  df <- data.table::fread(file_path, ...)
   
   # Check if the date column exists
   if (!(date_column %in% colnames(df))) {
