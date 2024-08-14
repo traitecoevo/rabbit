@@ -10,7 +10,7 @@ Encoding: UTF-8
 Imports: 
     dplyr,
     arrow,
-    readr,
+    data.table,
     rollRCPP
 Suggests:
     covr,
