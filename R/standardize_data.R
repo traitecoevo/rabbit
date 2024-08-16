@@ -17,7 +17,10 @@
 #' \dontrun{
 #'   df <- read_csv_with_dates("data.csv", "date", "%Y-%m-%d")
 #' }
-read_csv_with_dates <- function(file_path, date_column, date_format, output_file = gsub(".csv", ".parquet", file_path, fixed = TRUE), ...) {
+#' 
+#' 
+
+read_csv_with_dates <- function(file_path, date_column, timezone="Australia/Adelaide",output_file = gsub(".csv", ".parquet", file_path, fixed = TRUE), ...) {
   # Check if the file exists
   if (!file.exists(file_path)) {
     stop("The file does not exist.")
@@ -31,9 +34,8 @@ read_csv_with_dates <- function(file_path, date_column, date_format, output_file
     stop("The specified date column does not exist in the file.")
   }
   
-  # Convert the date column to Date type
-  # using base R for now, this will have to switch to lubridate at some point
-  df[[date_column]] <- as.Date(df[[date_column]], format = date_format)
+  # Convert the date column to POSIXct (date-time) type using lubridate
+  df[[date_column]] <- lubridate::mdy_hms(df[[date_column]], tz = timezone)
   
   # Check if there are any NA values after conversion
   if (any(is.na(df[[date_column]]))) {
@@ -47,11 +49,18 @@ read_csv_with_dates <- function(file_path, date_column, date_format, output_file
   cat("Date Column Summary:\n")
   print(summary(df[[date_column]]))
   
-  # save parquet goes here
+  # Save the data as a Parquet file
   arrow::write_parquet(df, output_file)
   cat("File saved as parquet format for future use:", output_file, "\n")
   
   # Return the data frame
   return(df)
 }
+
+read_parquet_process_datetime <- function(file_path,timezone="Australia/Adelaide") {
+  df<-read_parquet(file_path)
+  df$Timestamp <- dmy_hms(df$Timestamp, tz = timezone)
+  return(df)
+}
+
 
