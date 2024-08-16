@@ -22,6 +22,8 @@ calculate_rolling_mean <- function(df, column_name, window_size) {
   }
   
   # Calculate the rolling mean
+  # TODO: check that the "align" option is doing the right thing
+  # also could use the "by" option also
   rolling_mean <- roll_mean(df[[column_name]], n = window_size, fill = NA)
   rolling_sd <- roll_sd(df[[column_name]], n = window_size, fill = NA)
   
