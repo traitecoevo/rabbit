@@ -7,20 +7,17 @@
 #' @param file_path A string representing the path to the CSV file.
 #' @param date_column A string representing the name of the date column in the CSV file.
 #' @param timezone Timezone that the accelerometer is set to
-#' @param ... Other arguments to pass into \code{read_csv_with_dates}
+#' @param ... Other arguments to pass into read in function
 #' @param output_file path of output file
 #' @rdname read_csv_with_dates
 #' @return A data frame containing the CSV data, with the date column converted to Date type.
 #' @export
 #'
-#' @examples
-#' \dontrun{
-#'   df <- read_csv_with_dates("data.csv", "date", "%Y-%m-%d")
-#' }
-#' 
-#' 
 
-read_csv_with_dates <- function(file_path, date_column, timezone="Australia/Adelaide",output_file = gsub(".csv", ".parquet", file_path, fixed = TRUE), ...) {
+
+read_csv_with_dates <- function(file_path, date_column, 
+                                timezone="Australia/Adelaide", 
+                                output_file = gsub(".csv", ".parquet", file_path, fixed = TRUE), ...) {
   # Check if the file exists
   if (!file.exists(file_path)) {
     stop("The file does not exist.")

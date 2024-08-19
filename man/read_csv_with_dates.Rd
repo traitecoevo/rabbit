@@ -21,7 +21,7 @@ read_csv_with_dates(
 
 \item{output_file}{path of output file}
 
-\item{...}{Other arguments to pass into \code{read_csv_with_dates}}
+\item{...}{Other arguments to pass into read in function}
 }
 \value{
 A data frame containing the CSV data, with the date column converted to Date type.
@@ -30,11 +30,4 @@ A data frame containing the CSV data, with the date column converted to Date typ
 This function reads in a CSV file, checks that the date column can be properly processed,
 and prints out summary statistics about the file, including the number of rows, columns, and
 a summary of the date column.
-}
-\examples{
-\dontrun{
-  df <- read_csv_with_dates("data.csv", "date", "\%Y-\%m-\%d")
-}
-
-
 }
