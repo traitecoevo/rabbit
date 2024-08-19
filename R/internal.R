@@ -58,16 +58,6 @@ roll_skewness <- function(x, n) {
 }
 
 
-#not in C++, I'm not clever enough to get that to work
-roll_kurtosis <- function(x, n) {
-  kurtosis_vals <- zoo::rollapply(x, width = n, FUN = function(window) {
-    kurtosis <- e1071::kurtosis(window, na.rm = TRUE)
-    return(kurtosis)
-  }, fill = NA, align = "right")
-  return(kurtosis_vals)
-}
-
-
 #' hard coding column names for now
 #' @noRd
 rolling_mean_time_date <- function(date_time_vec,window_size) {

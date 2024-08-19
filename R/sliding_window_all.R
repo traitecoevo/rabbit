@@ -52,7 +52,6 @@ moving_window_calcs_df <- function(df, window_size=50) {
   variance_y <- (sum_y_2 - window_size * mean_y ^ 2) / window_size
   variance_z <- (sum_z_2 - window_size * mean_z ^ 2) / window_size
                    
-
   # Calculate rolling sums of quads
   sum_x_4 <- RcppRoll::roll_sum(x ^ 4,
                                  n = window_size,
@@ -203,11 +202,7 @@ moving_window_calcs_df <- function(df, window_size=50) {
                           n = window_size,
                           fill = NA,
                           align = "right") -
-            3 * mean_z * variance_z - mean_z^3) / sdz ^ 3,
-
-    kux = roll_kurtosis(x, window_size),
-    kuy = roll_kurtosis(y, window_size),
-    kuz = roll_kurtosis(z, window_size)
+            3 * mean_z * variance_z - mean_z^3) / sdz ^ 3
   )
 
   return(out)

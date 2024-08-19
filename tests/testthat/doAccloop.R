@@ -16,16 +16,6 @@ doAccloop <- function(dat1) {
     return(y)
   }
 
-  kurtosis <- function(x) {
-    
-    n <- length(x)
-    x <- x - mean(x)
-    r <- n * sum(x ^ 4) / (sum(x ^ 2) ^ 2)
-    y <- r * (1 - 1 / n) ^ 2 - 3
-
-    return(y)
-  }
-
   meanX=mean(dat1[, 2])
   meany=mean(dat1[, 3])
   meanz=mean(dat1[, 4])
@@ -68,11 +58,6 @@ doAccloop <- function(dat1) {
   sky<-skewness(dat1[, 3])
   skz<-skewness(dat1[, 4])
   
-  ##kurtosis in each axis
-  kux<-kurtosis(dat1[, 2])
-  kuy<-kurtosis(dat1[, 3])
-  kuz<-kurtosis(dat1[, 4])
-  
   #time is V1
   time<-mean(dat1[, 1])
   
@@ -86,8 +71,7 @@ doAccloop <- function(dat1) {
     SMA=SMA,  minODBA=minODBA, maxODBA=maxODBA, minVDBA=minVDBA, maxVDBA=maxVDBA, 
     sumODBA=sumODBA, sumVDBA=sumVDBA, 
     corXY=corXY, corXZ=corXZ, corYZ=corYZ, 
-    skx=skx,  sky=sky, skz=skz, 
-    kux=kux,  kuy=kuy, kuz=kuz
+    skx=skx,  sky=sky, skz=skz
   )
   
     return(dat_temp_matrix)

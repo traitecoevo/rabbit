@@ -121,12 +121,6 @@ moving_window_calcs <- function(df, window_size=50) {
   
   dat_temp_matrix$skz <- roll_skewness(df$accZ,window_size)
   
-  dat_temp_matrix$kux <- roll_kurtosis(df$accX,window_size)
-  
-  dat_temp_matrix$kuy <- roll_kurtosis(df$accY,window_size)
-  
-  dat_temp_matrix$kuz <- roll_kurtosis(df$accZ,window_size)
-  
   return(dat_temp_matrix)
 }
 
