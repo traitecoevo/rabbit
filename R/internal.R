@@ -49,9 +49,8 @@ roll_cor <- function(x, y, window_size) {
 
 #not in C++, I'm not clever enough to get that to work
 roll_skewness <- function(x, n) {
-  # Use rollapply to extract windows and calculate skewness
+  # Use rollapply to extract windows
   skewness_vals <- zoo::rollapply(x, width = n, FUN = function(window) {
-    # Calculate skewness using e1071::skewness for the current window
     skewness <- e1071::skewness(window, na.rm = TRUE)
     return(skewness)
   }, fill = NA, align = "right")
@@ -61,13 +60,11 @@ roll_skewness <- function(x, n) {
 
 #not in C++, I'm not clever enough to get that to work
 roll_kurtosis <- function(x, n) {
-  # Use rollapply to extract windows and calculate skewness
-  skewness_vals <- zoo::rollapply(x, width = n, FUN = function(window) {
-    # Calculate skewness using e1071::skewness for the current window
-    skewness <- e1071::kurtosis(window, na.rm = TRUE)
-    return(skewness)
+  kurtosis_vals <- zoo::rollapply(x, width = n, FUN = function(window) {
+    kurtosis <- e1071::kurtosis(window, na.rm = TRUE)
+    return(kurtosis)
   }, fill = NA, align = "right")
-  return(skewness_vals)
+  return(kurtosis_vals)
 }
 
 

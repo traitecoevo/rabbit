@@ -1,6 +1,7 @@
 doAccloop <- function(dat1) { # Creates a training or test matrix, from data frame x, using a sample of size n (default is all rows)			
   
   require(e1071,quietly = TRUE)
+  require(stats)
   meanX=mean(dat1[, 2])
   meany=mean(dat1[, 3])
   meanz=mean(dat1[, 4])
@@ -75,7 +76,7 @@ test_that("whole thing doesn't error out and matches older version", {
     df <- arrow::read_parquet("raw_Pic2Jan_50000.parquet")
     expect_s3_class(df, "data.frame")
   } else {
-    skip("File data/raw_Pic2Jan_50000.parquet not found")
+    skip("File raw_Pic2Jan_50000.parquet not found")
   }
   expect_type(moving_window_calcs(df),"list")
   
