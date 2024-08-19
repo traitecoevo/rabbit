@@ -71,7 +71,7 @@ doAccloop <- function(dat1) { # Creates a training or test matrix, from data fra
 }
 
 test_that("whole thing doesn't error out and matches older version", {
-  df <- arrow::read_parquet("../../data-raw/raw_Pic2Jan_50000.parquet")
+  df <- arrow::read_parquet("../../data/raw_Pic2Jan_50000.parquet")
   expect_type(moving_window_calcs(df),"list")
   
   #
