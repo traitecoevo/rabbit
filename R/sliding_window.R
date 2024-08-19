@@ -37,7 +37,7 @@ moving_window_calcs <- function(df, window_size=50) {
                                n = window_size,
                                fill = NA,
                                align = "right"),
-    minx <- RcppRoll::roll_min(df$accX,
+    minx = RcppRoll::roll_min(df$accX,
                                n = window_size,
                                fill = NA,
                                align = "right"),
@@ -61,50 +61,50 @@ moving_window_calcs <- function(df, window_size=50) {
                              n = window_size,
                              fill = NA,
                              align = "right"),
-    SMA = RcppRoll::roll_mean(abs(df$accX),
+    SMA = (RcppRoll::roll_sum(abs(df$accX),
                           n = window_size,
                           fill = NA,
                           align = "right") +
-           RcppRoll::roll_mean(abs(df$accY),
+           RcppRoll::roll_sum(abs(df$accY),
                           n = window_size,
                           fill = NA,
                           align = "right") +
-           RcppRoll::roll_mean(abs(df$accZ),
+           RcppRoll::roll_sum(abs(df$accZ),
                           n = window_size,
                           fill = NA,
-                          align = "right"),
-    ODBA = abs(df$accX) + abs(df$accY) + abs(df$accZ), #direct from doAccloop.R, no change
-    VDBA = sqrt(df$accX^2+df$accY^2+df$accZ^2)  #direct from doAccloop.R, no change
-  )
+                          align = "right"))/window_size)
+  ODBA <- abs(df$accX) + abs(df$accY) + abs(df$accZ) #direct from doAccloop.R, no change
+  VDBA <- sqrt(df$accX^2+df$accY^2+df$accZ^2)  #direct from doAccloop.R, no change
+  
   #not sure if this is efficient, but need new line here; alternatively move ODBA and VDBA above
   #to fit with the tibble, allocate all memory at once vibe
   
-  dat_temp_matrix$minODBA <- RcppRoll::roll_min(dat_temp_matrix$ODBA,
+  dat_temp_matrix$minODBA <- RcppRoll::roll_min(ODBA,
                                               n = window_size,
                                               fill = NA,
                                               align = "right")
   
-  dat_temp_matrix$maxODBA <- RcppRoll::roll_max(dat_temp_matrix$ODBA,
+  dat_temp_matrix$maxODBA <- RcppRoll::roll_max(ODBA,
                                                 n = window_size,
                                                 fill = NA,
                                                 align = "right")
   
-  dat_temp_matrix$minVDBA <- RcppRoll::roll_min(dat_temp_matrix$VDBA,
+  dat_temp_matrix$minVDBA <- RcppRoll::roll_min(VDBA,
                                                 n = window_size,
                                                 fill = NA,
                                                 align = "right")
   
-  dat_temp_matrix$maxVDBA <- RcppRoll::roll_max(dat_temp_matrix$VDBA,
+  dat_temp_matrix$maxVDBA <- RcppRoll::roll_max(VDBA,
                                                 n = window_size,
                                                 fill = NA,
                                                 align = "right")
   
-  dat_temp_matrix$sumODBA <- RcppRoll::roll_sum(dat_temp_matrix$ODBA,
+  dat_temp_matrix$sumODBA <- RcppRoll::roll_sum(ODBA,
                                                 n = window_size,
                                                 fill = NA,
                                                 align = "right")
   
-  dat_temp_matrix$sumVDBA <- RcppRoll::roll_sum(dat_temp_matrix$VDBA,
+  dat_temp_matrix$sumVDBA <- RcppRoll::roll_sum(VDBA,
                                                 n = window_size,
                                                 fill = NA,
                                                 align = "right")
