@@ -6,7 +6,7 @@
 #'
 #' @param file_path A string representing the path to the CSV file.
 #' @param date_column A string representing the name of the date column in the CSV file.
-#' @param date_format A string representing the expected format of the date column (e.g., "%Y-%m-%d").
+#' @param timezone Timezone that the accelerometer is set to
 #' @param ... Other arguments to pass into \code{read_csv_with_dates}
 #' @param output_file path of output file
 #' @rdname read_csv_with_dates

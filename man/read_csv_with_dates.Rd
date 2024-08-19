@@ -4,14 +4,22 @@
 \alias{read_csv_with_dates}
 \title{Read CSV with Date Checking and Summary Stats}
 \usage{
-read_csv_with_dates(file_path, date_column, date_format, ...)
+read_csv_with_dates(
+  file_path,
+  date_column,
+  timezone = "Australia/Adelaide",
+  output_file = gsub(".csv", ".parquet", file_path, fixed = TRUE),
+  ...
+)
 }
 \arguments{
 \item{file_path}{A string representing the path to the CSV file.}
 
 \item{date_column}{A string representing the name of the date column in the CSV file.}
 
-\item{date_format}{A string representing the expected format of the date column (e.g., "\%Y-\%m-\%d").}
+\item{timezone}{Timezone that the accelerometer is set to}
+
+\item{output_file}{path of output file}
 
 \item{...}{Other arguments to pass into \code{read_csv_with_dates}}
 }
@@ -27,4 +35,6 @@ a summary of the date column.
 \dontrun{
   df <- read_csv_with_dates("data.csv", "date", "\%Y-\%m-\%d")
 }
+
+
 }
