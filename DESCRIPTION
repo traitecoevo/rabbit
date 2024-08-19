@@ -12,7 +12,9 @@ Imports:
     arrow,
     data.table,
     RcppRoll,
-    lubridate
+    lubridate,
+    zoo,
+    e1071
 Suggests:
     covr,
     knitr,
