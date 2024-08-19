@@ -1,7 +1,31 @@
-doAccloop <- function(jj, data) { # Creates a training or test matrix, from data frame x, using a sample of size n (default is all rows)			
+
+## Original function from old code provided to the project
+## Written around 10 years ago. We're keeping it here for comaprsion against newer results
+
+doAccloop <- function(dat1) {
+
+  ##  require(e1071,quietly = TRUE)
+  ## These functions were being sourced from package e1071. They have been simplified and added here to reduce dependcies
   
-  dat1=data[jj:(jj+50),]
-  
+  skewness <- function(x) {
+    n <- length(x)
+    x <- x - mean(x)
+    y <- sqrt(n) * sum(x ^ 3) / (sum(x ^ 2) ^ (3/2))
+    y <- y * ((1 - 1 / n)) ^ (3/2)
+    
+    return(y)
+  }
+
+  kurtosis <- function(x) {
+    
+    n <- length(x)
+    x <- x - mean(x)
+    r <- n * sum(x ^ 4) / (sum(x ^ 2) ^ 2)
+    y <- r * (1 - 1 / n) ^ 2 - 3
+
+    return(y)
+  }
+
   meanX=mean(dat1[, 2])
   meany=mean(dat1[, 3])
   meanz=mean(dat1[, 4])
@@ -54,7 +78,7 @@ doAccloop <- function(jj, data) { # Creates a training or test matrix, from data
   
   #Time of epoch - this works for AX3 time input only
   
-  dat_temp_matrix <- cbind(
+  dat_temp_matrix <- dplyr::tibble(
     time=time, meanX=meanX, meanY=meany, meanZ=meanz,
     maxx=maxx, maxy=maxy, maxz=maxz, 
     minx=minx, miny=miny, minz=minz,
@@ -66,8 +90,5 @@ doAccloop <- function(jj, data) { # Creates a training or test matrix, from data
     kux=kux,  kuy=kuy, kuz=kuz
   )
   
-  # Ensure it is a matrix
-  dat_temp <- as.matrix(dat_temp_matrix)
-  
-  return(dat_temp)
-}
+    return(dat_temp_matrix)
+  }
