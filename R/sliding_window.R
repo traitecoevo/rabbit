@@ -1,52 +1,94 @@
-#' Calculate Rolling Mean and SD for a Specified Column
+#' moving_window_calcs
 #'
-#' This function takes a data frame and computes the rolling mean for a specified column using a specified window size.
-#' The resulting rolling mean values are added as a new column in the data frame.
+#' This function takes a data frame and computes sliding window calculations to set up for classification
 #'
 #' @param df A data frame containing the data.
-#' @param column_name A string specifying the name of the column for which the rolling mean is to be calculated.
 #' @param window_size An integer specifying the size of the rolling window.
-#' @return A data frame with an additional column containing the rolling mean values.
-#' The new column will be named as `column_name_rolling_mean_window_size`.
-#' @importFrom RcppRoll roll_mean
+#' @return A data frame with names following doAccloop.R
 #' @export
-#' @examples
-#' df <- data.frame(Time = 1:10, Value = c(1, 3, 5, 7, 9, 11, 13, 15, 17, 19))
-#' df <- calculate_rolling_mean(df, "Value", 3)
-#' print(df)
+#'
 
-calculate_rolling_mean <- function(df, column_name, window_size) {
-  # Check if the specified column exists
-  if (!(column_name %in% colnames(df))) {
-    stop("The specified column does not exist in the data frame.")
-  }
-  require(tictoc)
-  # Calculate the rolling mean
-  # TODO: check that the "align" option is doing the right thing
-  # also could use the "by" option also
-  tic()
-  rolling_mean <- roll_mean(df[[column_name]],
-                            n = window_size,
-                            fill = NA,
-                            align = "right")
-  toc()
-  tic()
-  rolling_sd <- roll_sd(df[[column_name]],
-                        n = window_size,
-                        fill = NA,
-                        align = "right")
-  toc()
-  tic()
-  rolling_cor <- rolling_correlation(df$accX, df$accY, window_size)
-  toc()
+moving_window_calcs <- function(df, window_size=50) {
+ 
+   dat_temp_matrix <- cbind(
+        time = rolling_mean_time_date(df$Timestamp),
+        meanX <- RcppRoll::roll_mean(df$accX,
+                                  n = window_size,
+                                  fill = NA,
+                                  align = "right"),
+        meanY <- RcppRoll::roll_mean(df$accY,
+                           n = window_size,
+                           fill = NA,
+                           align = "right"),
+        meanZ <- RcppRoll::roll_mean(df$accZ,
+                           n = window_size,
+                           fill = NA,
+                           align = "right"),
+        maxx <- RcppRoll::roll_max(df$accX,
+                           n = window_size,
+                           fill = NA,
+                           align = "right"),
+        maxy <- RcppRoll::roll_max(df$accY,
+                         n = window_size,
+                         fill = NA,
+                         align = "right"),
+        maxz <- RcppRoll::roll_max(df$accZ,
+                         n = window_size,
+                         fill = NA,
+                         align = "right"),
+        minx <- RcppRoll::roll_min(df$accX,
+                                   n = window_size,
+                                   fill = NA,
+                                   align = "right"),
+        miny <- RcppRoll::roll_min(df$accY,
+                                   n = window_size,
+                                   fill = NA,
+                                   align = "right"),
+        minz <- RcppRoll::roll_min(df$accZ,
+                                   n = window_size,
+                                   fill = NA,
+                                   align = "right"),
+        sdx <- RcppRoll::roll_sd(df$accX,
+                                   n = window_size,
+                                   fill = NA,
+                                   align = "right"),
+        sdy <- RcppRoll::roll_sd(df$accY,
+                                   n = window_size,
+                                   fill = NA,
+                                   align = "right"),
+        sdz <- RcppRoll::roll_sd(df$accZ,
+                                   n = window_size,
+                                   fill = NA,
+                                   align = "right")
+   )
+   return(dat_temp_matrix)
+    # SMA=SMA,  minODBA=minODBA, maxODBA=maxODBA, minVDBA=minVDBA, maxVDBA=maxVDBA, 
+    # sumODBA=sumODBA, sumVDBA=sumVDBA, 
+    # corXY=corXY, corXZ=corXZ, corYZ=corYZ, 
+    # skx=skx,  sky=sky, skz=skz, 
+    # kux=kux,  kuy=kuy, kuz=kuz
+}
+
+
+#' hard coding column names for now
+#' @noRd
+rolling_mean_time_date <- function(date_time_vec) {
+  # Convert to numeric
+  numeric_dates <- as.numeric(lubridate::dmy_hms(date_time_vec))
+  # Calculate the mean
+  mean_numeric <- RcppRoll::roll_mean(numeric_dates,na.rm=TRUE)
+  # Convert back to POSIXct
+  mean_date <- lubridate::as_datetime(mean_numeric)
+  return(mean_date)
+}  
   
   
-  # Create a new column with the rolling mean
-  new_column_name <- paste0(column_name, "_rolling_mean_", window_size)
-  new_column_name_2 <- paste0(column_name, "_rolling_sd_", window_size)
-  df[[new_column_name]] <- rolling_mean
-  df[[new_column_name_2]] <- rolling_sd
-  
-  # Return the updated data frame
+
+#' hard coding column names for now
+#' @noRd
+moving_window_cors <- function(df, window_size=50) {
+  df$cor_xy <- rolling_correlation(df$accX,df$accY,window_size)
+  df$cor_xz <- rolling_correlation(df$accX,df$accZ,window_size)
+  df$cor_yz <- rolling_correlation(df$accY,df$accZ,window_size)
   return(df)
 }
