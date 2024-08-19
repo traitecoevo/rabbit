@@ -20,12 +20,20 @@ calculate_rolling_mean <- function(df, column_name, window_size) {
   if (!(column_name %in% colnames(df))) {
     stop("The specified column does not exist in the data frame.")
   }
-  
+  require(tictoc)
   # Calculate the rolling mean
   # TODO: check that the "align" option is doing the right thing
   # also could use the "by" option also
-  rolling_mean <- roll_mean(df[[column_name]], n = window_size, fill = NA)
-  rolling_sd <- roll_sd(df[[column_name]], n = window_size, fill = NA)
+  tic()
+  rolling_mean <- roll_mean(df[[column_name]], n = window_size, fill = NA, align = "right")
+  toc()
+  tic()
+  rolling_sd <- roll_sd(df[[column_name]], n = window_size, fill = NA, align = "right")
+  toc()
+  tic()
+  rolling_cor <- rolling_correlation(df$accX,df$accY,window_size)
+  toc()
+  
   
   # Create a new column with the rolling mean
   new_column_name <- paste0(column_name, "_rolling_mean_", window_size)
