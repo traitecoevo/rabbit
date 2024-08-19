@@ -1,0 +1,10 @@
+"","behaviors","subject","days","hours","x"
+"1","digging","time",20,0,12189
+"2","fast.locomotion","time",20,0,26724
+"3","foraging","time",20,0,796059
+"4","medium.locomotion","time",20,0,132396
+"5","resting","time",20,0,360162
+"6","slow.locomotion","time",20,0,377502
+"7","tunnel.digging","time",20,0,133314
+"8","vigilant","time",20,0,474657
+"9","walking","time",20,0,234345
