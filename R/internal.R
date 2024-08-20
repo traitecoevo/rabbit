@@ -47,24 +47,32 @@ roll_cor <- function(x, y, window_size) {
   return(correlation)
 }
 
-#not in C++, I'm not clever enough to get that to work
 roll_skewness <- function(x, n) {
-  # Use rollapply to extract windows
-  skewness_vals <- zoo::rollapply(x, width = n, FUN = function(window) {
-    skewness <- e1071::skewness(window, na.rm = TRUE)
-    return(skewness)
-  }, fill = NA, align = "right")
-    return(skewness_vals)
-}
+  
+  sum_x <- RcppRoll::roll_sum(x,
+    n = n,
+    fill = NA,
+    align = "right")
+  
+  sum_x_2 <- RcppRoll::roll_sum(x^2,
+    n = n,
+    fill = NA,
+    align = "right")
 
-
-#not in C++, I'm not clever enough to get that to work
-roll_kurtosis <- function(x, n) {
-  kurtosis_vals <- zoo::rollapply(x, width = n, FUN = function(window) {
-    kurtosis <- e1071::kurtosis(window, na.rm = TRUE)
-    return(kurtosis)
-  }, fill = NA, align = "right")
-  return(kurtosis_vals)
+  mean_x <- sum_x / n
+    
+  # Calculate variances
+  variance_x <- (sum_x_2 - n * mean_x ^ 2) / n
+  
+  sdx = sqrt(variance_x * n / (n-1) )
+  
+  skx <- (RcppRoll::roll_mean(x^3,
+    n = n,
+    fill = NA,
+    align = "right") -
+        3 * mean_x * variance_x - mean_x^3) / sdx ^ 3
+  
+  return(skx)
 }
 
 

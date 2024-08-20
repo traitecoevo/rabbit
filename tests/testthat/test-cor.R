@@ -15,9 +15,9 @@ test_that("correlation works", {
 test_that("skewness works", {
   x <- rnorm(50)
   test_value <- roll_skewness(x, 50)[50]
-  expect_equal(e1071::skewness(x), test_value)
+  expect_equal(skewness(x), test_value)
   
   x2 <- rnorm(100)
   test_value2 <- roll_skewness(x2, 50)[100]
-  expect_equal(e1071::skewness(x2[51:100]), test_value2)
+  expect_equal(skewness(x2[51:100]), test_value2)
 })

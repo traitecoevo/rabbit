@@ -1,7 +1,23 @@
-doAccloop <- function(jj, data) { # Creates a training or test matrix, from data frame x, using a sample of size n (default is all rows)			
-  
-  dat1=data[jj:(jj+50),]
-  
+
+## doAccloop is the Original function from old code provided to the project
+## Written around 10 years ago. We're keeping it here for comaprsion against newer results
+## doAccloop_all is a wrapepr toe enabl clauclations over sliding windows, similar to what was implemented previously
+
+doAccloop_all <- function(dat1) {
+
+  i <- seq(nrow(dat1))
+  dfs <- purrr::map(i, ~ dplyr::slice(dat1, .x + 0:49))
+
+  f <- function(x){
+    doAccloop(as.matrix(x[,c(6,3:5)]))[,-1]
+  }
+
+  out <-  purrr::map(dfs, f) |> purrr::list_rbind()
+
+}
+
+doAccloop <- function(dat1) {
+
   meanX=mean(dat1[, 2])
   meany=mean(dat1[, 3])
   meanz=mean(dat1[, 4])
@@ -44,17 +60,12 @@ doAccloop <- function(jj, data) { # Creates a training or test matrix, from data
   sky<-skewness(dat1[, 3])
   skz<-skewness(dat1[, 4])
   
-  ##kurtosis in each axis
-  kux<-kurtosis(dat1[, 2])
-  kuy<-kurtosis(dat1[, 3])
-  kuz<-kurtosis(dat1[, 4])
-  
   #time is V1
   time<-mean(dat1[, 1])
   
   #Time of epoch - this works for AX3 time input only
   
-  dat_temp_matrix <- cbind(
+  dat_temp_matrix <- dplyr::tibble(
     time=time, meanX=meanX, meanY=meany, meanZ=meanz,
     maxx=maxx, maxy=maxy, maxz=maxz, 
     minx=minx, miny=miny, minz=minz,
@@ -62,12 +73,22 @@ doAccloop <- function(jj, data) { # Creates a training or test matrix, from data
     SMA=SMA,  minODBA=minODBA, maxODBA=maxODBA, minVDBA=minVDBA, maxVDBA=maxVDBA, 
     sumODBA=sumODBA, sumVDBA=sumVDBA, 
     corXY=corXY, corXZ=corXZ, corYZ=corYZ, 
-    skx=skx,  sky=sky, skz=skz, 
-    kux=kux,  kuy=kuy, kuz=kuz
+    skx=skx,  sky=sky, skz=skz
   )
   
-  # Ensure it is a matrix
-  dat_temp <- as.matrix(dat_temp_matrix)
+    return(dat_temp_matrix)
+  }
+
+
+## require(e1071,quietly = TRUE)
+## skewness functions was being sourced from package e1071. It has been simplified and added here to reduce dependencies
+## Only included for sake of testing
   
-  return(dat_temp)
-}
+  skewness <- function(x) {
+    n <- length(x)
+    x <- x - mean(x)
+    y <- sqrt(n) * sum(x ^ 3) / (sum(x ^ 2) ^ (3/2))
+    y <- y * ((1 - 1 / n)) ^ (3/2)
+    
+    return(y)
+  }

@@ -1,9 +1,12 @@
 Package: rabbit
 Title: Rabbitly Process Data From Triaxial Accelerometers
 Version: 0.0.0.9000
-Authors@R: 
-    person("Courntey", "Adams", , "courtney.adams@student.unsw.edu.au", role = c("aut", "cre"),
-           comment = c(ORCID = "0009-0007-3757-7507"))
+Authors@R: c(
+  person(given = "Courntey",  family = "Adams", email = "courtney.adams@student.unsw.edu.au", role = c("aut", "cre"), comment = c(ORCID = "0009-0007-3757-7507")),
+  person(given = "Jack", family = "Bilby", role = c("aut", "ctb")),
+  person(given = "Daniel", family = "Falster", role = c("aut", "ctb"), comment = c(ORCID = "0000-0002-9814-092X")),
+  person(given = "Will", family = "Cornwell", role = c("aut", "ctb"), comment = c(ORCID = "0000-0003-4080-4073"))
+  )
 Description: Rabbitly Process Data From Triaxial Accelerometers
 License: `use_mit_license()`
 Encoding: UTF-8
@@ -12,11 +15,10 @@ Imports:
     arrow,
     data.table,
     RcppRoll,
-    lubridate,
-    zoo,
-    e1071
+    lubridate
 Suggests:
     covr,
+    purrr,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
