@@ -1,20 +1,22 @@
 
-## Original function from old code provided to the project
+## doAccloop is the Original function from old code provided to the project
 ## Written around 10 years ago. We're keeping it here for comaprsion against newer results
+## doAccloop_all is a wrapepr toe enabl clauclations over sliding windows, similar to what was implemented previously
+
+doAccloop_all <- function(dat1) {
+
+  i <- seq(nrow(dat1))
+  dfs <- purrr::map(i, ~ dplyr::slice(dat1, .x + 0:49))
+
+  f <- function(x){
+    doAccloop(as.matrix(x[,c(6,3:5)]))[,-1]
+  }
+
+  out <-  purrr::map(dfs, f) |> purrr::list_rbind()
+
+}
 
 doAccloop <- function(dat1) {
-
-  ##  require(e1071,quietly = TRUE)
-  ## These functions were being sourced from package e1071. They have been simplified and added here to reduce dependcies
-  
-  skewness <- function(x) {
-    n <- length(x)
-    x <- x - mean(x)
-    y <- sqrt(n) * sum(x ^ 3) / (sum(x ^ 2) ^ (3/2))
-    y <- y * ((1 - 1 / n)) ^ (3/2)
-    
-    return(y)
-  }
 
   meanX=mean(dat1[, 2])
   meany=mean(dat1[, 3])
@@ -75,4 +77,18 @@ doAccloop <- function(dat1) {
   )
   
     return(dat_temp_matrix)
+  }
+
+
+## require(e1071,quietly = TRUE)
+## skewness functions was being sourced from package e1071. It has been simplified and added here to reduce dependencies
+## Only included for sake of testing
+  
+  skewness <- function(x) {
+    n <- length(x)
+    x <- x - mean(x)
+    y <- sqrt(n) * sum(x ^ 3) / (sum(x ^ 2) ^ (3/2))
+    y <- y * ((1 - 1 / n)) ^ (3/2)
+    
+    return(y)
   }

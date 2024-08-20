@@ -2,9 +2,12 @@
 % Please edit documentation in R/sliding_window.R
 \name{moving_window_calcs}
 \alias{moving_window_calcs}
+\alias{moving_window_calcs_2}
 \title{moving_window_calcs}
 \usage{
 moving_window_calcs(df, window_size = 50)
+
+moving_window_calcs_2(df, window_size = 50)
 }
 \arguments{
 \item{df}{A data frame containing the data.}
