@@ -35,64 +35,45 @@ You can install the development version of rabbit from [GitHub](https://github.c
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+This is a basic example:
 
 ```{r example}
 library(rabbit)
 library(dplyr)
-
-#Read file
-data <- arrow::read_parquet("tests/testthat/raw_Pic2Jan_50000.parquet") |> slice(1:1000)
-
-# Calcualte metrics
-data_metrics <- moving_window_calcs_2(data)
-
-data_metrics %>% slice(50:150)
 ```
+super-fast version of the rolling window calculations:
 
-Speed comparison on test file, comparing 3 techniques
-
-```{r}
-# source("tests/testthat/doAccloop.R")
-# 
-# microbenchmark::microbenchmark(
-#   doAccloop_all(data),
-#   moving_window_calcs(data),
-#   moving_window_calcs_2(data)
-# )
-```
-
-
-Speed comparison on a big test file, comparing the 2 faster techniques
-```{r}
-
-# df <- arrow::read_parquet('/Users/dfalster/GitHub/projects/Adams-Accelerometer_2024/data/Pic2Jan_S1.parquet')
-# nrow(df)
-```
-
-version 1
-```{r}
-#system.time(moving_window_calcs(df))
-```
-
-version 2
+example file is less than one hour of a bilby called piccolo:
 ```{r}
 df <- arrow::read_parquet("tests/testthat/raw_Pic2Jan_50000.parquet")
+nrow(df)
+```
+pretty fast:
+```{r}
 system.time(dat <- moving_window_calcs_2(df))
 ```
-## Identifying high sumODBA times
+## Identifying high sumVDBA times
+
+sumVDBA is the best measure we have of heat-generating movement or activities:
+
 ```{r,warning=FALSE}
 library(ggplot2)
 dat %>%
   ggplot(aes(x = time, y = sumVDBA)) +
   geom_point() + theme_classic()
 ```
+
+Now can classify all these movements based on a pre-built classifier from a zoo animal:
+
 ```{r,warning=FALSE}
 nighttime_activities <- classify_behaviors(dat, MSOM_path = "tests/testthat/MSOM_8by7.rda")
 
 nighttime_activities <- nighttime_activities %>%
   mutate(behavior = forcats::fct_reorder(behavior, sumVDBA, .fun = median, na.rm = TRUE))
+```
 
+and we can plot energy use and estimated activity through time
+```{r}
 nighttime_activities %>%
   filter(!is.na(behavior)) %>%
   ggplot(aes(x = time, y = sumVDBA, col = behavior)) +
