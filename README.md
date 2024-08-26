@@ -50,12 +50,12 @@ nrow(df)
 #> [1] 50000
 ```
 
-pretty fast:
+the new version is pretty fast:
 
 ``` r
 system.time(dat <- moving_window_calcs_2(df))
 #>    user  system elapsed 
-#>   0.304   0.015   0.326
+#>   0.306   0.014   0.328
 ```
 
 ## Identifying high sumVDBA times
@@ -77,9 +77,21 @@ from a zoo animal:
 
 ``` r
 nighttime_activities <- classify_behaviors(dat, MSOM_path = "tests/testthat/MSOM_8by7.rda")
+```
 
+we can order the activities by their estimated energy use / heat
+production:
+
+``` r
 nighttime_activities <- nighttime_activities %>%
   mutate(behavior = forcats::fct_reorder(behavior, sumVDBA, .fun = median, na.rm = TRUE))
+#> Warning: There was 1 warning in `mutate()`.
+#> ℹ In argument: `behavior = forcats::fct_reorder(behavior, sumVDBA, .fun =
+#>   median, na.rm = TRUE)`.
+#> Caused by warning:
+#> ! `fct_reorder()` removing 49 missing values.
+#> ℹ Use `.na_rm = TRUE` to silence this message.
+#> ℹ Use `.na_rm = FALSE` to preserve NAs.
 ```
 
 and we can plot energy use and estimated activity through time
@@ -91,4 +103,4 @@ nighttime_activities %>%
   geom_point(alpha = 0.7) + theme_classic()
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />

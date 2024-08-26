@@ -48,7 +48,7 @@ example file is less than one hour of a bilby called piccolo:
 df <- arrow::read_parquet("tests/testthat/raw_Pic2Jan_50000.parquet")
 nrow(df)
 ```
-pretty fast:
+the new version is pretty fast:
 ```{r}
 system.time(dat <- moving_window_calcs_2(df))
 ```
@@ -67,7 +67,11 @@ Now can classify all these movements based on a pre-built classifier from a zoo 
 
 ```{r,warning=FALSE}
 nighttime_activities <- classify_behaviors(dat, MSOM_path = "tests/testthat/MSOM_8by7.rda")
+```
 
+we can order the activities by their estimated energy use / heat production:
+
+```{r}
 nighttime_activities <- nighttime_activities %>%
   mutate(behavior = forcats::fct_reorder(behavior, sumVDBA, .fun = median, na.rm = TRUE))
 ```
