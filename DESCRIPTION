@@ -10,12 +10,15 @@ Authors@R: c(
 Description: Rabbitly Process Data From Triaxial Accelerometers
 License: `use_mit_license()`
 Encoding: UTF-8
+Depends:
+    R (>= 4.0.0)
 Imports: 
     dplyr,
     arrow,
     data.table,
     RcppRoll,
     lubridate,
+    ggplot2,
     kohonen
 Suggests:
     covr,

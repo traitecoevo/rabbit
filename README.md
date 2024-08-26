@@ -20,7 +20,7 @@ You can install the development version of rabbit from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("traitecoevo/rabbit")
+ devtools::install_github("traitecoevo/rabbit")
 ```
 
 ## Example
@@ -47,60 +47,81 @@ data_metrics <- moving_window_calcs_2(data)
 
 data_metrics %>% slice(50:150)
 #> # A tibble: 101 × 26
-#>    time                meanX  meanY meanZ  maxx   maxy  maxz  minx   miny  minz    sdx     sdy    sdz   SMA minODBA maxODBA minVDBA maxVDBA sumODBA sumVDBA   corXY   corXZ  corYZ    skx       sky
-#>    <dttm>              <dbl>  <dbl> <dbl> <dbl>  <dbl> <dbl> <dbl>  <dbl> <dbl>  <dbl>   <dbl>  <dbl> <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>   <dbl>  <dbl>  <dbl>     <dbl>
-#>  1 1970-01-01 00:00:00 0.592 -0.317 0.713  0.61 -0.297 0.735 0.563 -0.328 0.688 0.0142 0.00826 0.0119  1.62    1.56    1.66   0.942    1.01    81.1    49.0 -0.0804 -0.0423 0.216  -0.237 -0.000909
-#>  2 1970-01-01 00:00:00 0.592 -0.317 0.713  0.61 -0.297 0.735 0.563 -0.328 0.688 0.0144 0.00861 0.0124  1.62    1.56    1.66   0.942    1.01    81.1    49.0 -0.0143 -0.0886 0.0836 -0.254  0.0923  
-#>  3 1970-01-01 00:00:00 0.593 -0.317 0.712  0.61 -0.297 0.735 0.563 -0.328 0.688 0.0138 0.00847 0.0124  1.62    1.56    1.66   0.942    1.01    81.1    49.0 -0.0732 -0.0708 0.0921 -0.228  0.0403  
-#>  4 1970-01-01 00:00:00 0.594 -0.317 0.713  0.61 -0.297 0.735 0.563 -0.328 0.688 0.0131 0.00858 0.0119  1.62    1.58    1.66   0.957    1.01    81.2    49.0 -0.0514 -0.172  0.128  -0.149  0.0971  
-#>  5 1970-01-01 00:00:00 0.593 -0.317 0.713  0.61 -0.297 0.735 0.563 -0.328 0.688 0.0136 0.00844 0.0119  1.62    1.58    1.66   0.957    1.01    81.1    49.0 -0.0361 -0.177  0.114  -0.195  0.0457  
-#>  6 1970-01-01 00:00:00 0.592 -0.317 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688 0.0142 0.00843 0.0116  1.62    1.58    1.66   0.957    1.01    81.1    49.0 -0.0433 -0.235  0.141  -0.225  0.0585  
-#>  7 1970-01-01 00:00:00 0.592 -0.317 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688 0.0144 0.00843 0.0116  1.62    1.58    1.66   0.957    1.01    81.1    49.0 -0.0253 -0.265  0.104  -0.240  0.0585  
-#>  8 1970-01-01 00:00:00 0.592 -0.316 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688 0.0143 0.00834 0.0115  1.62    1.58    1.66   0.957    1.01    81.1    49.0 -0.0559 -0.260  0.115  -0.295  0.0697  
-#>  9 1970-01-01 00:00:00 0.592 -0.316 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688 0.0143 0.00819 0.0115  1.62    1.58    1.66   0.957    1.01    81.1    49.0 -0.0523 -0.262  0.129  -0.295  0.0232  
-#> 10 1970-01-01 00:00:00 0.592 -0.316 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688 0.0141 0.00819 0.0119  1.62    1.58    1.66   0.957    1.01    81.1    49.0 -0.0622 -0.264  0.135  -0.283  0.0232  
+#>    time                meanX  meanY meanZ  maxx   maxy  maxz  minx   miny  minz
+#>    <dttm>              <dbl>  <dbl> <dbl> <dbl>  <dbl> <dbl> <dbl>  <dbl> <dbl>
+#>  1 2024-01-03 01:08:16 0.592 -0.317 0.713  0.61 -0.297 0.735 0.563 -0.328 0.688
+#>  2 2024-01-03 01:08:17 0.592 -0.317 0.713  0.61 -0.297 0.735 0.563 -0.328 0.688
+#>  3 2024-01-03 01:08:17 0.593 -0.317 0.712  0.61 -0.297 0.735 0.563 -0.328 0.688
+#>  4 2024-01-03 01:08:17 0.594 -0.317 0.713  0.61 -0.297 0.735 0.563 -0.328 0.688
+#>  5 2024-01-03 01:08:17 0.593 -0.317 0.713  0.61 -0.297 0.735 0.563 -0.328 0.688
+#>  6 2024-01-03 01:08:17 0.592 -0.317 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688
+#>  7 2024-01-03 01:08:17 0.592 -0.317 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688
+#>  8 2024-01-03 01:08:17 0.592 -0.316 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688
+#>  9 2024-01-03 01:08:17 0.592 -0.316 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688
+#> 10 2024-01-03 01:08:17 0.592 -0.316 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688
 #> # ℹ 91 more rows
-#> # ℹ 1 more variable: skz <dbl>
+#> # ℹ 16 more variables: sdx <dbl>, sdy <dbl>, sdz <dbl>, SMA <dbl>,
+#> #   minODBA <dbl>, maxODBA <dbl>, minVDBA <dbl>, maxVDBA <dbl>, sumODBA <dbl>,
+#> #   sumVDBA <dbl>, corXY <dbl>, corXZ <dbl>, corYZ <dbl>, skx <dbl>, sky <dbl>,
+#> #   skz <dbl>
 ```
 
 Speed comparison on test file, comparing 3 techniques
 
 ``` r
-source("tests/testthat/doAccloop.R")
-
-microbenchmark::microbenchmark(
-  doAccloop_all(data),
-  moving_window_calcs(data),
-  moving_window_calcs_2(data)
-)
-#> Warning in microbenchmark::microbenchmark(doAccloop_all(data), moving_window_calcs(data), : less accurate nanosecond times to avoid potential integer overflows
-#> Unit: milliseconds
-#>                         expr         min          lq        mean      median          uq        max neval cld
-#>          doAccloop_all(data) 1874.630536 1924.027336 1957.852846 1944.725366 1975.835469 2156.93837   100  a 
-#>    moving_window_calcs(data)    8.334029    8.542699    8.890808    8.678962    8.841568   12.56634   100   b
-#>  moving_window_calcs_2(data)    7.946661    8.187188    8.807385    8.397169    8.768752   12.94694   100   b
+# source("tests/testthat/doAccloop.R")
+# 
+# microbenchmark::microbenchmark(
+#   doAccloop_all(data),
+#   moving_window_calcs(data),
+#   moving_window_calcs_2(data)
+# )
 ```
 
 Speed comparison on a big test file, comparing the 2 faster techniques
 
 ``` r
-df <- arrow::read_parquet('/Users/dfalster/GitHub/projects/Adams-Accelerometer_2024/data/Pic2Jan_S1.parquet')
-nrow(df)
-#> [1] 23196001
+
+# df <- arrow::read_parquet('/Users/dfalster/GitHub/projects/Adams-Accelerometer_2024/data/Pic2Jan_S1.parquet')
+# nrow(df)
 ```
 
 version 1
 
 ``` r
-system.time(moving_window_calcs(df))
-#>    user  system elapsed 
-#>  73.113   7.256  81.563
+#system.time(moving_window_calcs(df))
 ```
 
 version 2
 
 ``` r
-system.time(moving_window_calcs_2(df))
+df <- arrow::read_parquet("tests/testthat/raw_Pic2Jan_50000.parquet")
+system.time(dat <- moving_window_calcs_2(df))
 #>    user  system elapsed 
-#>  41.972   4.096  46.985
+#>   0.130   0.007   0.138
 ```
+
+## Identifying high sumODBA times
+
+``` r
+library(ggplot2)
+dat %>%
+  ggplot(aes(x = time, y = sumVDBA)) +
+  geom_point() + theme_classic()
+```
+
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+
+``` r
+nighttime_activities <- classify_behaviors(dat, MSOM_path = "tests/testthat/MSOM_8by7.rda")
+
+nighttime_activities <- nighttime_activities %>%
+  mutate(behavior = forcats::fct_reorder(behavior, sumVDBA, .fun = median, na.rm = TRUE))
+
+nighttime_activities %>%
+  filter(!is.na(behavior)) %>%
+  ggplot(aes(x = time, y = sumVDBA, col = behavior)) +
+  geom_point(alpha = 0.7) + theme_classic()
+```
+
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />

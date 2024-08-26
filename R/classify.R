@@ -17,19 +17,29 @@ plot_mode_behavior_by_window <- function(data,
     dplyr::summarise(mode_behavior = calculate_mode(!!sym(behavior_col))) %>%
     dplyr::filter(!is.na(mode_behavior)) -> mode_sum
   mode_sum %>%
-    ggplot2::ggplot(aes(x = window, y = mode_behavior, color = mode_behavior)) +
-    geom_point(size = 3) +
-    labs(
+    ggplot2::ggplot(ggplot2::aes(x = window, y = mode_behavior, color = mode_behavior)) +
+    ggplot2::geom_point(size = 3) +
+    ggplot2::labs(
       x = "Time",
       y = "Mode Behavior",
       title = paste0("Mode Behavior Every ", window_minutes, " Minutes")
     ) +
-    theme_minimal() -> plotting
+    ggplot2::theme_minimal() -> plotting
   print(plotting)
   return(mode_sum)
 }
 
-
+#' classify_behaviors
+#'
+#' This function takes a data frame and a classifier and predicts across the data frame assuming everything lines up
+#'
+#' @param dat A data frame containing the data.
+#' @param MSOM_path classifier
+#' @param quiet chill out
+#' @return A data frame with a column of behaviors
+#' @rdname classify_behaviors
+#' @export
+#'
 classify_behaviors <- function(
                                dat,
                                MSOM_path = "tests/testthat/MSOM_8by7.rda",
@@ -37,8 +47,7 @@ classify_behaviors <- function(
   #dat <- moving_window_calcs_2(acc_dat) #this might move out of the function
   dd <- as.matrix(dat[, -1])
   load(file = MSOM_path)
-  
-  ssom.pred <- predict(MSOM, newdata = dd, whatmap = 1) # this is slow part
+  ssom.pred <- kohonen:::predict.kohonen(MSOM, newdata = dd, whatmap = 1) # this is slow part
   
   dat$behavior <- ssom.pred$predictions$activity
   if (quiet)
