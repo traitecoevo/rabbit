@@ -30,14 +30,15 @@ plot_mode_behavior_by_window <- function(data,
 }
 
 
-classify_behaviors <- function(acc_dat = arrow::read_parquet("tests/testthat/raw_Pic2Jan_50000.parquet"),
+classify_behaviors <- function(
+                               dat,
                                MSOM_path = "tests/testthat/MSOM_8by7.rda",
                                quiet = FALSE) {
-  dat <- moving_window_calcs_2(acc_dat) #this might move out of the function
+  #dat <- moving_window_calcs_2(acc_dat) #this might move out of the function
   dd <- as.matrix(dat[, -1])
   load(file = MSOM_path)
   
-  ssom.pred <- kohonen::predict.kohonen(MSOM, newdata = dd, whatmap = 1) # this is slow part
+  ssom.pred <- predict(MSOM, newdata = dd, whatmap = 1) # this is slow part
   
   dat$behavior <- ssom.pred$predictions$activity
   if (quiet)
