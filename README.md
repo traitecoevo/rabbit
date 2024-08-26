@@ -55,7 +55,7 @@ the new version is pretty fast:
 ``` r
 system.time(dat <- moving_window_calcs_2(df))
 #>    user  system elapsed 
-#>   0.306   0.014   0.328
+#>   0.303   0.015   0.324
 ```
 
 ## Identifying high sumVDBA times
@@ -104,3 +104,31 @@ nighttime_activities %>%
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
+
+the data seems to at a temporal resolution of 25 readings per second
+which might be a lot to handle for various graphing applications. Here
+is a function to take the mode of the categorical variables at a given
+resolution.
+
+``` r
+window_in_minutes <- 1
+
+minute_summary <- summary_by_time(nighttime_activities,
+                                      time_col = "time",
+                                      behavior_col = "behavior",
+                                      window_minutes=window_in_minutes
+                                      )
+
+minute_summary %>%
+ggplot(aes(x = window, y = mode_behavior, color = mode_behavior)) +
+    geom_point(size = 3) +
+    labs(
+      x = "Time",
+      y = "Mode Behavior",
+      title = paste0("Most Common Behavior Within Every ", window_in_minutes, " Minute(s)")
+    ) +
+    theme_minimal() -> plotting
+  print(plotting)
+```
+
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />

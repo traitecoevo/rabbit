@@ -4,28 +4,26 @@ calculate_mode <- function(x) {
   ux[which.max(tabulate(match(x, ux)))]
 }
 
-# Function to calculate mode behavior for each window of N minutes
-plot_mode_behavior_by_window <- function(data,
-                                         time_col,
+#' summary_by_time
+#'
+#' @param data A data frame containing the data.
+#' @param time_col time col
+#' @param behavior_col behavior col
+#' @param window_minutes how to chunk
+#' @return A data frame with a summary
+#' @rdname summary_by_time
+#' @export
+#'
+summary_by_time <- function(data, time_col,
                                          behavior_col,
                                          window_minutes) {
   data %>%
-    dplyr::mutate(time = ymd_hms(!!sym(time_col)),
+    dplyr::mutate(time = lubridate::ymd_hms(!!sym(time_col)),
                   # Ensure the time column is in POSIXct format
-                  window = floor_date(time, unit = paste0(window_minutes, " mins"))) %>%
+                  window = lubridate::floor_date(time, unit = paste0(window_minutes, " mins"))) %>%
     dplyr::group_by(window) %>%
     dplyr::summarise(mode_behavior = calculate_mode(!!sym(behavior_col))) %>%
     dplyr::filter(!is.na(mode_behavior)) -> mode_sum
-  mode_sum %>%
-    ggplot2::ggplot(ggplot2::aes(x = window, y = mode_behavior, color = mode_behavior)) +
-    ggplot2::geom_point(size = 3) +
-    ggplot2::labs(
-      x = "Time",
-      y = "Mode Behavior",
-      title = paste0("Mode Behavior Every ", window_minutes, " Minutes")
-    ) +
-    ggplot2::theme_minimal() -> plotting
-  print(plotting)
   return(mode_sum)
 }
 
