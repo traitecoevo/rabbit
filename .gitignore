@@ -35,3 +35,6 @@ po/*~
 rsconnect/
 .DS_Store
 data-raw/data.parquet
+
+MSOM_8by7.rda
+MSOM_8by7.rds

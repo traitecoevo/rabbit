@@ -55,7 +55,7 @@ the new version is pretty fast:
 ``` r
 system.time(dat <- moving_window_calcs_2(df))
 #>    user  system elapsed 
-#>   0.300   0.015   0.319
+#>   0.132   0.010   0.161
 ```
 
 ## Identifying high sumVDBA times
@@ -67,7 +67,7 @@ activities:
 library(ggplot2)
 dat %>%
   ggplot(aes(x = time, y = sumVDBA)) +
-  geom_point() + theme_classic()
+  geom_point(size = 0.2) + theme_classic()
 ```
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
@@ -76,14 +76,19 @@ Now can classify all these movements based on a pre-built classifier
 from a zoo animal:
 
 ``` r
-nighttime_activities <- classify_behaviors(dat, MSOM_path = "tests/testthat/MSOM_8by7.rda")
+# load a classifcation object
+MSOM = readRDS("tests/testthat/MSOM_8by7_small.rds")
+
+# make predictions
+nighttime_activities <- classify_behaviors(dat, MSOM)
 ```
 
 we can order the activities by their estimated energy use / heat
 production:
 
 ``` r
-nighttime_activities <- nighttime_activities %>%
+nighttime_activities <- 
+  nighttime_activities %>%
   filter(!is.na(behavior)&!is.na(sumVDBA)) %>%
   mutate(behavior = forcats::fct_reorder(behavior, sumVDBA, .fun = median, na.rm = TRUE))
 ```
@@ -93,7 +98,7 @@ and we can plot energy use and estimated activity through time
 ``` r
 nighttime_activities %>%
   ggplot(aes(x = time, y = sumVDBA, col = behavior)) +
-  geom_point(alpha = 0.7) + theme_classic()
+  geom_point(alpha = 0.7, size = 0.2) + theme_classic()
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />

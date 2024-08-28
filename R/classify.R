@@ -32,7 +32,7 @@ summary_by_time <- function(data, time_col,
 #' This function takes a data frame and a classifier and predicts across the data frame assuming everything lines up
 #'
 #' @param dat A data frame containing the data.
-#' @param MSOM_path classifier
+#' @param MSOM  a classifier
 #' @param quiet chill out
 #' @return A data frame with a column of behaviors
 #' @rdname classify_behaviors
@@ -40,12 +40,10 @@ summary_by_time <- function(data, time_col,
 #'
 classify_behaviors <- function(
                                dat,
-                               MSOM_path = "tests/testthat/MSOM_8by7.rda",
+                               MSOM = readRDS("tests/testthat/MSOM2.rds"),
                                quiet = FALSE) {
-  #dat <- moving_window_calcs_2(acc_dat) #this might move out of the function
-  dd <- as.matrix(dat[, -1])
-  load(file = MSOM_path)
-  ssom.pred <- kohonen:::predict.kohonen(MSOM, newdata = dd, whatmap = 1) # this is slow part
+  
+  ssom.pred <- kohonen:::predict.kohonen(MSOM, newdata = as.matrix(dat[, -1]), whatmap = 1) # this is slow part
   
   dat$behavior <- ssom.pred$predictions$activity
   if (quiet)
