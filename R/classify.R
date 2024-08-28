@@ -18,11 +18,11 @@ summary_by_time <- function(data, time_col,
                                          behavior_col,
                                          window_minutes) {
   data %>%
-    dplyr::mutate(time = lubridate::ymd_hms(!!sym(time_col)),
+    dplyr::mutate(time = lubridate::ymd_hms(!!rlang::sym(time_col)),
                   # Ensure the time column is in POSIXct format
                   window = lubridate::floor_date(time, unit = paste0(window_minutes, " mins"))) %>%
     dplyr::group_by(window) %>%
-    dplyr::summarise(mode_behavior = calculate_mode(!!sym(behavior_col))) %>%
+    dplyr::summarise(mode_behavior = calculate_mode(!!rlang::sym(behavior_col))) %>%
     dplyr::filter(!is.na(mode_behavior)) -> mode_sum
   return(mode_sum)
 }

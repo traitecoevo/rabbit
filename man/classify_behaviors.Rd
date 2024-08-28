@@ -6,14 +6,14 @@
 \usage{
 classify_behaviors(
   dat,
-  MSOM_path = "tests/testthat/MSOM_8by7.rda",
+  MSOM = readRDS("tests/testthat/MSOM2.rds"),
   quiet = FALSE
 )
 }
 \arguments{
 \item{dat}{A data frame containing the data.}
 
-\item{MSOM_path}{classifier}
+\item{MSOM}{a classifier}
 
 \item{quiet}{chill out}
 }

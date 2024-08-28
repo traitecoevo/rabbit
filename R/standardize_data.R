@@ -55,8 +55,8 @@ read_csv_with_dates <- function(file_path, date_column,
 }
 
 read_parquet_process_datetime <- function(file_path,timezone="Australia/Adelaide") {
-  df<-read_parquet(file_path)
-  df$Timestamp <- dmy_hms(df$Timestamp, tz = timezone)
+  df <- arrow::read_parquet(file_path)
+  df$Timestamp <- lubridate::dmy_hms(df$Timestamp, tz = timezone)
   return(df)
 }
 
