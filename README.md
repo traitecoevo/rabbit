@@ -55,7 +55,7 @@ the new version is pretty fast:
 ``` r
 system.time(dat <- moving_window_calcs_2(df))
 #>    user  system elapsed 
-#>   0.303   0.015   0.324
+#>   0.300   0.015   0.319
 ```
 
 ## Identifying high sumVDBA times
@@ -84,21 +84,14 @@ production:
 
 ``` r
 nighttime_activities <- nighttime_activities %>%
+  filter(!is.na(behavior)&!is.na(sumVDBA)) %>%
   mutate(behavior = forcats::fct_reorder(behavior, sumVDBA, .fun = median, na.rm = TRUE))
-#> Warning: There was 1 warning in `mutate()`.
-#> ℹ In argument: `behavior = forcats::fct_reorder(behavior, sumVDBA, .fun =
-#>   median, na.rm = TRUE)`.
-#> Caused by warning:
-#> ! `fct_reorder()` removing 49 missing values.
-#> ℹ Use `.na_rm = TRUE` to silence this message.
-#> ℹ Use `.na_rm = FALSE` to preserve NAs.
 ```
 
 and we can plot energy use and estimated activity through time
 
 ``` r
 nighttime_activities %>%
-  filter(!is.na(behavior)) %>%
   ggplot(aes(x = time, y = sumVDBA, col = behavior)) +
   geom_point(alpha = 0.7) + theme_classic()
 ```
