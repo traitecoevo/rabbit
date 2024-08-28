@@ -15,6 +15,6 @@ lhs \%>\% rhs
 The result of calling \code{rhs(lhs)}.
 }
 \description{
-See \code{dplyr::\link[dplyr::pipe]{\%>\%}} for details.
+Pipe operator
 }
 \keyword{internal}
