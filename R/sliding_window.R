@@ -177,9 +177,7 @@ moving_window_calcs_2 <- function(df, window_size=50) {
 
   out <- 
     dplyr::tibble(
-      time = rolling_mean_time_date(df$Timestamp, window_size)
-    ) %>% 
-    dplyr::mutate(
+      time = rolling_mean_time_date(df$Timestamp, window_size),
       meanX = mean_x,
       meanY = mean_y,
       meanZ = mean_z,
