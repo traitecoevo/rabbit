@@ -44,4 +44,7 @@ test_that("whole thing doesn't error out and matches older version", {
   ii <- 49:249
   expect_equal(new2[ii,], old[ii,], tolerance=0.0001)
   expect_equal(new[ii,], new2[ii,], tolerance=0.0001)
+  
+  MSOM <- readRDS("MSOM_8by7_small.rds")
+  expect_type(nighttime_activities <- classify_behaviors(moving_window_calcs(df), MSOM,quiet=TRUE),"list")
 })
