@@ -8,126 +8,9 @@
 #' @rdname moving-window-calcs
 #' @export
 #'
-
-moving_window_calcs <- function(df, window_size=50) {
-  
-  dat_temp_matrix <- dplyr::tibble(
-    time = rolling_mean_time_date(df$Timestamp,
-                                  window_size),
-    meanX = RcppRoll::roll_mean(df$accX,
-                                 n = window_size,
-                                 fill = NA,
-                                 align = "right"),
-    meanY = RcppRoll::roll_mean(df$accY,
-                                 n = window_size,
-                                 fill = NA,
-                                 align = "right"),
-    meanZ = RcppRoll::roll_mean(df$accZ,
-                                 n = window_size,
-                                 fill = NA,
-                                 align = "right"),
-    maxx = RcppRoll::roll_max(df$accX,
-                               n = window_size,
-                               fill = NA,
-                               align = "right"),
-    maxy = RcppRoll::roll_max(df$accY,
-                               n = window_size,
-                               fill = NA,
-                               align = "right"),
-    maxz = RcppRoll::roll_max(df$accZ,
-                               n = window_size,
-                               fill = NA,
-                               align = "right"),
-    minx = RcppRoll::roll_min(df$accX,
-                               n = window_size,
-                               fill = NA,
-                               align = "right"),
-    miny = RcppRoll::roll_min(df$accY,
-                               n = window_size,
-                               fill = NA,
-                               align = "right"),
-    minz = RcppRoll::roll_min(df$accZ,
-                               n = window_size,
-                               fill = NA,
-                               align = "right"),
-    sdx = RcppRoll::roll_sd(df$accX,
-                             n = window_size,
-                             fill = NA,
-                             align = "right"),
-    sdy = RcppRoll::roll_sd(df$accY,
-                             n = window_size,
-                             fill = NA,
-                             align = "right"),
-    sdz = RcppRoll::roll_sd(df$accZ,
-                             n = window_size,
-                             fill = NA,
-                             align = "right"),
-    SMA = (RcppRoll::roll_sum(abs(df$accX),
-                          n = window_size,
-                          fill = NA,
-                          align = "right") +
-           RcppRoll::roll_sum(abs(df$accY),
-                          n = window_size,
-                          fill = NA,
-                          align = "right") +
-           RcppRoll::roll_sum(abs(df$accZ),
-                          n = window_size,
-                          fill = NA,
-                          align = "right"))/window_size)
-  ODBA <- abs(df$accX) + abs(df$accY) + abs(df$accZ) #direct from doAccloop.R, no change
-  VDBA <- sqrt(df$accX^2+df$accY^2+df$accZ^2)  #direct from doAccloop.R, no change
-  
-  #not sure if this is efficient, but need new line here; alternatively move ODBA and VDBA above
-  #to fit with the tibble, allocate all memory at once vibe
-  
-  dat_temp_matrix$minODBA <- RcppRoll::roll_min(ODBA,
-                                              n = window_size,
-                                              fill = NA,
-                                              align = "right")
-  
-  dat_temp_matrix$maxODBA <- RcppRoll::roll_max(ODBA,
-                                                n = window_size,
-                                                fill = NA,
-                                                align = "right")
-  
-  dat_temp_matrix$minVDBA <- RcppRoll::roll_min(VDBA,
-                                                n = window_size,
-                                                fill = NA,
-                                                align = "right")
-  
-  dat_temp_matrix$maxVDBA <- RcppRoll::roll_max(VDBA,
-                                                n = window_size,
-                                                fill = NA,
-                                                align = "right")
-  
-  dat_temp_matrix$sumODBA <- RcppRoll::roll_sum(ODBA,
-                                                n = window_size,
-                                                fill = NA,
-                                                align = "right")
-  
-  dat_temp_matrix$sumVDBA <- RcppRoll::roll_sum(VDBA,
-                                                n = window_size,
-                                                fill = NA,
-                                                align = "right")
-  
-  dat_temp_matrix$corXY <- roll_cor(df$accX,df$accY,window_size)
-  
-  dat_temp_matrix$corXZ <- roll_cor(df$accX,df$accZ,window_size)
-  
-  dat_temp_matrix$corYZ <- roll_cor(df$accY,df$accZ,window_size)
-  
-  dat_temp_matrix$skx <- roll_skewness(df$accX,window_size)
-  
-  dat_temp_matrix$sky <- roll_skewness(df$accY,window_size)
-  
-  dat_temp_matrix$skz <- roll_skewness(df$accZ,window_size)
-  
-  return(dat_temp_matrix)
-}
-
-
 #' @rdname moving-window-calcs
 #' @export
+
 moving_window_calcs_2 <- function(df, window_size=50) {
 
   # Define functions to use for rolling means
@@ -171,40 +54,39 @@ moving_window_calcs_2 <- function(df, window_size=50) {
   cov_xz <- (roll_sum(x * z) - window_size * mean_x * mean_z) / window_size
   cov_yz <- (roll_sum(y * z) - window_size * mean_y * mean_z) / window_size
    
-  # ??? what do we call these
+  # Calculate Overall Dynamic Body Acceleration (ODBA) and Vectorial Dynmic Body Acceleration (VDBA)
   ODBA = abs_x + abs_y + abs_z
   VDBA = sqrt(x_2 + y_2 + z_2)
+  
+  # Extract the ID from the file name
+  file_name <- basename(parquet_file)
+  name <- str_split(file_name, "_")[[1]][1]
 
   out <- 
     dplyr::tibble(
+      ID = name,
       time = rolling_mean_time_date(df$Timestamp, window_size),
       meanX = mean_x,
       meanY = mean_y,
       meanZ = mean_z,
-
       maxx = roll_max(x),
       maxy = roll_max(y),
       maxz = roll_max(z),
       minx = roll_min(x),
       miny = roll_min(y),
       minz = roll_min(z),
-
-      # Seemes we need to adjust for sample size
-      # previous code uses `sd` function, which like ‘var’ this uses denominator n - 1.
-      # I we could drop this, but results wouldn't be compatible
       sdx = sqrt(variance_x * window_size / (window_size-1) ),
       sdy = sqrt(variance_y * window_size / (window_size-1) ),
       sdz = sqrt(variance_z * window_size / (window_size-1) ),
-
       SMA = (roll_sum(abs_x) + roll_sum(abs_y) + roll_sum(abs_z))/window_size,
-      
       minODBA = roll_min(ODBA),
       maxODBA = roll_max(ODBA),
       minVDBA = roll_min(VDBA),
       maxVDBA = roll_max(VDBA),
       sumODBA = roll_sum(ODBA),
       sumVDBA = roll_sum(VDBA),
-    
+      meanODBA = roll_sum(ODBA) / window_size,
+      meanVDBA = roll_sum(VDBA) / window_size,
       corXY = cov_xy / sqrt(variance_x * variance_y),
       corXZ = cov_xz / sqrt(variance_x * variance_z),  
       corYZ = cov_yz / sqrt(variance_y * variance_z),
