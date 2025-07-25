@@ -10,8 +10,8 @@ To regenerate, run `quarto::quarto_render("Readme.Rmd", output_file = "README.md
 
 The goal of rabbit is to …
 
-Use package `RcppRoll` to optimise claulcations of metrics clculated in
-wolling windows, e.g. rolling mean, var, sd etc.
+Use package `RcppRoll` to optimise calculations of metrics calculated in
+rolling windows, e.g. rolling mean, var, sd etc.
 
 ## Installation
 
@@ -72,8 +72,7 @@ dat %>%
 
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
 
-Now can classify all these movements based on a pre-built classifier
-from a zoo animal:
+Now can classify all these movements based on a pre-built behavioural classifier:
 
 ``` r
 # load a classifcation object
@@ -103,7 +102,7 @@ nighttime_activities %>%
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
 
-the data seems to at a temporal resolution of 25 readings per second
+the data is at a temporal resolution of 25 readings per second
 which might be a lot to handle for various graphing applications. Here
 is a function to take the mode of the categorical variables at a given
 resolution.
