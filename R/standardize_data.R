@@ -14,7 +14,6 @@
 #' @export
 #'
 
-
 read_csv_with_dates <- function(file_path, date_column, 
                                 timezone="Australia/Adelaide", 
                                 output_file = gsub(".csv", ".parquet", file_path, fixed = TRUE), ...) {
@@ -54,10 +53,13 @@ read_csv_with_dates <- function(file_path, date_column,
   return(df)
 }
 
-read_parquet_process_datetime <- function(file_path,timezone="Australia/Adelaide") {
+read_parquet_process_datetime <- function(file_path, timezone = "Australia/Adelaide") {
   df <- arrow::read_parquet(file_path)
-  df$Timestamp <- lubridate::dmy_hms(df$Timestamp, tz = timezone)
+  if (inherits(df$Timestamp, "POSIXct")) {
+    attr(df$Timestamp, "tzone") <- timezone
+  } else {
+    df$Timestamp <- lubridate::parse_date_time(df$Timestamp, orders = c("ymd HMS", "mdy HMS", "dmy HMS"), tz = timezone)
+  }
+  
   return(df)
 }
-
-
