@@ -37,7 +37,7 @@ parquet_files <- list.files(path = "",
 for(parquet_file in parquet_files) {
   # Load the data
   df <- arrow::read_parquet(parquet_file)
-  na.omit(df)
+  df[complete.cases(df[,c("time")]), ]
   gc()  # Trigger garbage collection after reading the file
   
   # Crop each file
@@ -61,3 +61,4 @@ for(parquet_file in parquet_files) {
   
   print(summary_tibble)
 }
+
