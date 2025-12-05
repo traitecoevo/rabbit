@@ -80,7 +80,8 @@ roll_skewness <- function(x, n) {
 #' @noRd
 rolling_mean_time_date <- function(date_time_vec,window_size) {
   # Convert to numeric
-  numeric_dates <- as.numeric(lubridate::dmy_hms(date_time_vec))
+  # Assume input is already POSIXct — no need to re-parse
+  numeric_dates <- as.numeric(date_time_vec)
   # Calculate the mean
   mean_numeric <- RcppRoll::roll_mean(numeric_dates,
                                       n = window_size,
