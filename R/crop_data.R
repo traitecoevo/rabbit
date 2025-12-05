@@ -1,18 +1,34 @@
-#' Step 2
-#'
 #' This function Crops the start and end of each file to a specified time
 #'
 #' @param path A string representing the path to the .parquet files
 #' @param df A dataframe containing the data. 
-#' @param start_time The desired start time, uses the same end time. Defaults to 12:00:00
-#' @rdname read_parquet_crop_files A function to crop the start and end of each file
+#' @param start_time The desired start time, uses the same end time.
+#' @rdname crop_diurnal A function to crop the start and end of each file, start_time defaults to 01:00:00
+#' @rdname crop_nocturnal A function to crop the start and end of each file, start_time defaults to 12:00:00
 #' 
 
 library(dplyr)
 library(lubridate)
 library(tibble)
+library(arrow)
 
-read_parquet_crop_files <- function(df, start_time = "12:00:00") {
+# Diurnal function - defaults to cropping dataframe to the first instance of 01:00:00 and the last instance of 01:00:00
+crop_diurnal <- function(df, start_time = "01:00:00") {
+  df <- df %>%
+    mutate(TimeOnly = format(time, "%H:%M:%S"))
+  
+  matching_times <- df$time[df$TimeOnly == start_time]
+  
+  first_time <- min(matching_times, na.rm = TRUE)
+  last_time <- max(matching_times, na.rm = TRUE)
+  
+  df %>%
+    filter(time >= first_time & time <= last_time) %>%
+    select(-TimeOnly)
+}
+
+# Nocturnal function - defaults to cropping dataframe to the first instance of 12:00 and the last instance of 12:00
+crop_nocturnal <- function(df, start_time = "12:00:00") {
   df <- df %>%
     mutate(TimeOnly = format(time, "%H:%M:%S"))
   
@@ -41,7 +57,7 @@ for(parquet_file in parquet_files) {
   gc()  # Trigger garbage collection after reading the file
   
   # Crop each file
-  result2 <- read_parquet_crop_files(df)
+  result2 <- crop_nocturnal(df)
   gc()  # Trigger garbage collection after calculations
   
   # Extract first and lsat rows
@@ -61,4 +77,5 @@ for(parquet_file in parquet_files) {
   
   print(summary_tibble)
 }
+
 
