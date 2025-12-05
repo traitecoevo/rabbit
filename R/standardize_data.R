@@ -32,7 +32,7 @@ read_csv_with_dates <- function(file_path, date_column,
   }
   
   # Convert the date column to POSIXct (date-time) type using lubridate
-  df[[date_column]] <- lubridate::mdy_hms(df[[date_column]], tz = timezone)
+  df[[date_column]] <- lubridate::dmy_hms(df[[date_column]], tz = timezone)
   
   # Check if there are any NA values after conversion
   if (any(is.na(df[[date_column]]))) {
