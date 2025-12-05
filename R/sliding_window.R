@@ -25,9 +25,9 @@ moving_window_calcs_2 <- function(df, window_size=50) {
   roll_max <- function(x) RcppRoll::roll_max(x, 
       n = window_size, fill = NA, align = "right") 
 
-  x <- df$accX
-  y <- df$accY
-  z <- df$accZ
+  x <- df$X
+  y <- df$Y
+  z <- df$Z
 
   abs_x <- abs(x)
   abs_y <- abs(y)
@@ -59,8 +59,6 @@ moving_window_calcs_2 <- function(df, window_size=50) {
   # Extract the ID from the file name
   file_name <- basename(parquet_file)
   name <- str_split(file_name, "_")[[1]][1]
-
-  Temperature <- (df$'Temp. (°C)')
 
   out <- 
     dplyr::tibble(
@@ -96,7 +94,6 @@ moving_window_calcs_2 <- function(df, window_size=50) {
       skx = (roll_mean(x^3) - 3 * mean_x * variance_x - mean_x^3) / sdx ^ 3,
       sky = (roll_mean(y^3) - 3 * mean_y * variance_y - mean_y^3) / sdy ^ 3,    
       skz = (roll_mean(z^3) - 3 * mean_z * variance_z - mean_z^3) / sdz ^ 3,
-      Temp = Temperature
   )
 
   return(out)
