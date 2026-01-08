@@ -5,6 +5,7 @@
 #' @param start_time The desired start time, uses the same end time.
 #' @rdname crop_diurnal A function to crop the start and end of each file, start_time defaults to 01:00:00
 #' @rdname crop_nocturnal A function to crop the start and end of each file, start_time defaults to 12:00:00
+#' @rdname crop_custom A function to manually enter start and end times for a file
 #' 
 
 library(dplyr)
@@ -36,6 +37,22 @@ crop_nocturnal <- function(df, start_time = "12:00:00") {
   
   first_time <- min(matching_times, na.rm = TRUE)
   last_time <- max(matching_times, na.rm = TRUE)
+  
+  df %>%
+    filter(time >= first_time & time <= last_time) %>%
+    select(-TimeOnly)
+}
+
+# Custom function to manually enter specified strt and end times 
+crop_custom <- function(df,
+                               start_time = "12:00:00",
+                               end_time   = "12:00:00") {
+  
+  df <- df %>%
+    mutate(TimeOnly = format(time, "%H:%M:%S"))
+  
+  first_time <- min(df$time[df$TimeOnly == start_time], na.rm = TRUE)
+  last_time  <- max(df$time[df$TimeOnly == end_time], na.rm = TRUE)
   
   df %>%
     filter(time >= first_time & time <= last_time) %>%
@@ -77,5 +94,6 @@ for(parquet_file in parquet_files) {
   
   print(summary_tibble)
 }
+
 
 
