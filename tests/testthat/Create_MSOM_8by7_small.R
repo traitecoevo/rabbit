@@ -39,7 +39,7 @@ nrow(MSOM2$data$measurements) # 1233
 
 # check it runs
 df <- arrow::read_parquet("tests/testthat/raw_Pic2Jan_50000.parquet")
-dat <- moving_window_calcs_2(df)
+dat <- sliding_window(df)
 ssom.pred <- kohonen:::predict.kohonen(MSOM2, newdata = as.matrix(dat[, -1]), whatmap = 1)
 
 # Save
