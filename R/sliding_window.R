@@ -1,15 +1,15 @@
-#' moving_window_calcs
+#' Step 2
 #'
 #' This function takes a data frame and computes sliding window calculations to set up for classification
 #'
 #' @param df A data frame containing the data.
 #' @param window_size An integer specifying the size of the rolling window.
 #' @return A data frame with names following doAccloop.R
-#' @rdname moving-window-calcs
+#' @rdname sliding_window
 #' @export
 #'
 
-moving_window_calcs_2 <- function(df, window_size=50) {
+sliding_window <- function(df, window_size=50) {
 
   # Define functions to use for rolling means
   # We use the package RcppRoll, as functions are written in C++
