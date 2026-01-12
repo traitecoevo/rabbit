@@ -1,3 +1,5 @@
+#' Step 3
+#'
 #' This function Crops the start and end of each file to a specified time
 #'
 #' @param path A string representing the path to the .parquet files
@@ -94,6 +96,7 @@ for(parquet_file in parquet_files) {
   
   print(summary_tibble)
 }
+
 
 
 
