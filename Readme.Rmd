@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 The goal of rabbit is to ...
 
-Use package `RcppRoll` to optimise claulcations of metrics clculated in wolling windows, e.g. rolling mean, var, sd etc.
+Use package `RcppRoll` to optimise claulcations of metrics calculated in rolling windows, e.g. rolling mean, var, sd etc.
 
 ## Installation
 
@@ -50,7 +50,7 @@ nrow(df)
 ```
 the new version is pretty fast:
 ```{r}
-system.time(dat <- moving_window_calcs_2(df))
+system.time(dat <- sliding_window(df))
 ```
 
 ## Identifying high sumVDBA times
@@ -64,7 +64,7 @@ dat %>%
   geom_point(size = 0.2) + theme_classic()
 ```
 
-Now can classify all these movements based on a pre-built classifier from a zoo animal:
+Now can classify all these movements based on a pre-built behavioural classifier:
 
 ```{r,warning=FALSE}
 # load a classifcation object
