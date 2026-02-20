@@ -1,102 +1,38 @@
-#' Step 3
+
+
+#' This function Crops the start and end of each file to a specified time. Use crop_diurnal for diurnal data and crop_nocturnal for nocturnal data.
 #'
-#' This function Crops the start and end of each file to a specified time
-#'
-#' @param path A string representing the path to the .parquet files
-#' @param df A dataframe containing the data. 
-#' @param start_time The desired start time, uses the same end time.
-#' @rdname crop_diurnal A function to crop the start and end of each file, start_time defaults to 01:00:00
-#' @rdname crop_nocturnal A function to crop the start and end of each file, start_time defaults to 12:00:00
-#' @rdname crop_custom A function to manually enter start and end times for a file
-#' 
+#' @param df A dataframe containing the data.
+#' @param start_time The desired start time
+#' @param end_time The desired end time
+#' @rdname crop_times
+#' @export
+crop_times <- function(df, start_time = "00:00:00", end_time   = "24:00:00") {
+  
+  if(end_time <= start_time) {
+    stop("in crop_times: end_time must be after start_time")
+  }
 
-library(dplyr)
-library(lubridate)
-library(tibble)
-library(arrow)
-
-# Diurnal function - defaults to cropping dataframe to the first instance of 01:00:00 and the last instance of 01:00:00
-crop_diurnal <- function(df, start_time = "01:00:00") {
-  df <- df %>%
-    mutate(TimeOnly = format(time, "%H:%M:%S"))
-  
-  matching_times <- df$time[df$TimeOnly == start_time]
-  
-  first_time <- min(matching_times, na.rm = TRUE)
-  last_time <- max(matching_times, na.rm = TRUE)
-  
-  df %>%
-    filter(time >= first_time & time <= last_time) %>%
-    select(-TimeOnly)
+  df |>
+    dplyr::filter(
+      dplyr::between(
+        format(df$time, "%H:%M:%S"), start_time, end_time)
+    )
 }
 
-# Nocturnal function - defaults to cropping dataframe to the first instance of 12:00 and the last instance of 12:00
-crop_nocturnal <- function(df, start_time = "12:00:00") {
-  df <- df %>%
-    mutate(TimeOnly = format(time, "%H:%M:%S"))
-  
-  matching_times <- df$time[df$TimeOnly == start_time]
-  
-  first_time <- min(matching_times, na.rm = TRUE)
-  last_time <- max(matching_times, na.rm = TRUE)
-  
-  df %>%
-    filter(time >= first_time & time <= last_time) %>%
-    select(-TimeOnly)
+#' @rdname crop_times
+#' @export
+crop_diurnal <- function(df, start_time = "06:00:00", end_time = "18:00:00") {
+  crop_times(df, start_time = start_time, end_time = end_time)
 }
 
-# Custom function to manually enter specified strt and end times 
-crop_custom <- function(df,
-                               start_time = "12:00:00",
-                               end_time   = "12:00:00") {
-  
-  df <- df %>%
-    mutate(TimeOnly = format(time, "%H:%M:%S"))
-  
-  first_time <- min(df$time[df$TimeOnly == start_time], na.rm = TRUE)
-  last_time  <- max(df$time[df$TimeOnly == end_time], na.rm = TRUE)
-  
-  df %>%
-    filter(time >= first_time & time <= last_time) %>%
-    select(-TimeOnly)
+#' @rdname crop_times
+#' @export
+crop_nocturnal <- function(df, start_time = "18:00:00", end_time = "06:00:00") {
+  df |>
+    dplyr::filter(
+      !dplyr::between(
+        format(df$time, "%H:%M:%S"), end_time, start_time
+      )
+    )
 }
-
-# Create an empty table
-summary_tibble <- tibble()
-
-# List all parquet files in folder
-parquet_files <- list.files(path = "", 
-                            pattern = "*.parquet", full.names = TRUE)
-
-# Loop through each .parquet file, crop files, display summary in tibble table and save
-for(parquet_file in parquet_files) {
-  # Load the data
-  df <- arrow::read_parquet(parquet_file)
-  df[complete.cases(df[,c("time")]), ]
-  gc()  # Trigger garbage collection after reading the file
-  
-  # Crop each file
-  result2 <- crop_nocturnal(df)
-  gc()  # Trigger garbage collection after calculations
-  
-  # Extract first and lsat rows
-  first_row <- result2[1, ]
-  last_row <- result2[nrow(result2), ]
-  
-  # Combine first and last rows into summary tibble
-  summary_tibble <- bind_rows(summary_tibble, first_row, last_row)
-  
-  # Generate the new filename
-  filename <- basename(parquet_file)
-  new_filename <- sub(".parquet", "_crop.parquet", filename)
-  
-  # Save the result to the Calculations folder
-  arrow::write_parquet(result2, paste0("Cropped/", new_filename))
-  gc()  # Trigger garbage collection after saving the file
-  
-  print(summary_tibble)
-}
-
-
-
-

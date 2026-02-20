@@ -20,37 +20,48 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of rabbit is to ...
+The package `rabbit` provides functions to standardise raw accelerometer data and extract movement dynamics from it. Accelerometer data is often collected in a raw format that may not be immediately suitable for analysis. The `standardize_data` function reads in raw accelerometer data, standardises the column names, and converts the timestamp to a consistent format. The `extract_movement_dynamics` function takes the standardised data and calculates various movement dynamics metrics, such as mean acceleration, variance, covariance, Overall Dynamic Body Acceleration (ODBA), and Vectorial Dynamic Body Acceleration (VDBA) using rolling window calculations. The data is then returned in a tidy format, ready for further analysis or classification of behaviour.
 
-Use package `RcppRoll` to optimise claulcations of metrics calculated in rolling windows, e.g. rolling mean, var, sd etc.
+Accelerometer data is often collected at high frequencies, resulting in large datasets. The `rabbit` package is designed to efficiently process these large datasets by leveraging the `RcppRoll` package for optimized rolling window calculations. This allows users to quickly extract meaningful movement dynamics metrics from their accelerometer data, even when dealing with extensive recordings.
+
 
 ## Installation
 
-You can install the development version of rabbit from [GitHub](https://github.com/) with:
+You can install the development version of `rabbit` from GitHub using the `remotes` package:
 
 ```{r install, eval=FALSE}
-# install.packages("devtools")
- devtools::install_github("traitecoevo/rabbit")
+# install.packages("remotes")
+remotes::install_github("traitecoevo/rabbit")
 ```
 
 ## Example
 
-This is a basic example:
+This is a basic example file is less than one hour of a bilby called piccolo:
+
 
 ```{r example}
 library(rabbit)
 library(dplyr)
-```
-super-fast version of the rolling window calculations:
 
-example file is less than one hour of a bilby called piccolo:
-```{r}
-df <- arrow::read_parquet("tests/testthat/raw_Pic2Jan_50000.parquet")
+file_in = system.file("extdata", "raw_Pic2Jan_50000.parquet", package = "rabbit")
+
+df <- 
+  standardize_data(file_in = file_in, vars = c("Timestamp","accX","accY","accZ")) |> 
+  extract_movement_dynamics()
+
 nrow(df)
+
+df |> filter(!is.na(time))
 ```
-the new version is pretty fast:
+
+Alternatively, you can read in the data and then standardise it:
+
 ```{r}
-system.time(dat <- sliding_window(df))
+library(arrow)
+df <- arrow::read_parquet(file_in)
+df_std <- standardize_data(df, vars = c("Timestamp","accX","accY","accZ"))
+df_mvt <- extract_movement_dynamics(df_std)
+
 ```
 
 ## Identifying high sumVDBA times
@@ -59,59 +70,13 @@ sumVDBA is the best measure we have of heat-generating movement or activities:
 
 ```{r,warning=FALSE}
 library(ggplot2)
-dat %>%
+df |> filter(!is.na(time)) |>
   ggplot(aes(x = time, y = sumVDBA)) +
   geom_point(size = 0.2) + theme_classic()
 ```
 
-Now can classify all these movements based on a pre-built behavioural classifier:
+## Classifying behaviour
 
-```{r,warning=FALSE}
-# load a classifcation object
-MSOM = readRDS("tests/testthat/MSOM_8by7_small.rds")
-
-# make predictions
-nighttime_activities <- classify_behaviors(dat, MSOM)
-```
-
-we can order the activities by their estimated energy use / heat production:
-
-```{r}
-nighttime_activities <- 
-  nighttime_activities %>%
-  filter(!is.na(behavior)&!is.na(sumVDBA)) %>%
-  mutate(behavior = forcats::fct_reorder(behavior, sumVDBA, .fun = median, na.rm = TRUE))
-```
-
-and we can plot energy use and estimated activity through time
-```{r}
-nighttime_activities %>%
-  ggplot(aes(x = time, y = sumVDBA, col = behavior)) +
-  geom_point(alpha = 0.7, size = 0.2) + theme_classic()
-```
-
-the data seems to at a temporal resolution of 25 readings per second which might be a lot to handle for various graphing applications.  Here is a function to take the mode of the categorical variables at a given resolution.
-
-```{r}
-window_in_minutes <- 1
-
-minute_summary <- summary_by_time(nighttime_activities,
-                                      time_col = "time",
-                                      behavior_col = "behavior",
-                                      window_minutes=window_in_minutes
-                                      )
-
-minute_summary %>%
-ggplot(aes(x = window, y = mode_behavior, color = mode_behavior)) +
-    geom_point(size = 3) +
-    labs(
-      x = "Time",
-      y = "Mode Behavior",
-      title = paste0("Most Common Behavior Within Every ", window_in_minutes, " Minute(s)")
-    ) +
-    theme_minimal() -> plotting
-  print(plotting)
-```
-
+Data is now ready for classification of behaviour using your own behavioural classifier
 
 
