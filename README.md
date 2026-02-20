@@ -7,6 +7,8 @@ To regenerate, run `quarto::quarto_render("Readme.Rmd", output_file = "README.md
 
 <!-- badges: start -->
 
+[![R-CMD-check](https://github.com/traitecoevo/rabbit/actions/workflows/R-CMD-check.yml/badge.svg)](https://github.com/traitecoevo/rabbit/actions/workflows/R-CMD-check.yml)
+<!-- [![codecov](https://codecov.io/gh/traitecoevo/rabbit/branch/master/graph/badge.svg?token=JT1M0AMZ44)](https://codecov.io/gh/traitecoevo/rabbit) -->
 <!-- badges: end -->
 
 The package `rabbit` provides functions to standardise raw accelerometer

@@ -18,6 +18,8 @@ knitr::opts_chunk$set(
 # rabbit
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/traitecoevo/rabbit/actions/workflows/R-CMD-check.yml/badge.svg)](https://github.com/traitecoevo/rabbit/actions/workflows/R-CMD-check.yml)
+<!-- [![codecov](https://codecov.io/gh/traitecoevo/rabbit/branch/master/graph/badge.svg?token=JT1M0AMZ44)](https://codecov.io/gh/traitecoevo/rabbit) -->
 <!-- badges: end -->
 
 The package `rabbit` provides functions to standardise raw accelerometer data and extract movement dynamics from it. Accelerometer data is often collected in a raw format that may not be immediately suitable for analysis. The `standardize_data` function reads in raw accelerometer data, standardises the column names, and converts the timestamp to a consistent format. The `extract_movement_dynamics` function takes the standardised data and calculates various movement dynamics metrics, such as mean acceleration, variance, covariance, Overall Dynamic Body Acceleration (ODBA), and Vectorial Dynamic Body Acceleration (VDBA) using rolling window calculations. The data is then returned in a tidy format, ready for further analysis or classification of behaviour.
@@ -70,7 +72,7 @@ sumVDBA is the best measure we have of heat-generating movement or activities:
 
 ```{r,warning=FALSE}
 library(ggplot2)
-df |> filter(!is.na(time)) |>
+df_mvt |> filter(!is.na(time)) |>
   ggplot(aes(x = time, y = sumVDBA)) +
   geom_point(size = 0.2) + theme_classic()
 ```
