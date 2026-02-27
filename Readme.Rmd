@@ -24,14 +24,11 @@ knitr::opts_chunk$set(
 
 The package {rabbit} provides functions to standardise raw accelerometer data and extract movement dynamics from it. Accelerometer data is often collected in a raw format that may not be immediately suitable for analysis. 
 
-The `standardize_data` function reads in raw accelerometer data, standardises the column names, and converts the timestamp to a consistent format. 
+* `standardize_data`: reads in raw accelerometer data, standardises the column names, and converts the timestamp to a consistent format. 
+* `extract_movement_dynamics`: function takes the standardised data and calculates various movement dynamics metrics, such as mean acceleration, variance, covariance, Overall Dynamic Body Acceleration (ODBA), and Vectorial Dynamic Body Acceleration (VDBA) using rolling window calculations. The data is then returned in a tidy format, ready for further analysis or classification of behaviour.
+* `crop_ends`, `crop_diurnal`, and `crop_nocturnal`: Useful for removing records that are outside of the desired time window, such as records collected before the device was attached or after it was removed.
 
-The `extract_movement_dynamics` function takes the standardised data and calculates various movement dynamics metrics, such as mean acceleration, variance, covariance, Overall Dynamic Body Acceleration (ODBA), and Vectorial Dynamic Body Acceleration (VDBA) using rolling window calculations. The data is then returned in a tidy format, ready for further analysis or classification of behaviour.
-
-Accelerometer data is often collected at high frequencies, resulting in large datasets. The {rabbit} package is designed to efficiently process these large datasets
-
-
-The {rabbit} package is designed for efficient rolling window calculations. Compared to the original code ingerited by the team, it is 1000-2000 times faster. This means that processing a file that previously took > 1 day can now be done in just less than a minute. This makes it feasible to process large datasets of accelerometer data in a reasonable time frame. Speed gains are achieved via effective design combined with the use of the [{RcppRoll}](https://cran.r-project.org/web/packages/RcppRoll/index.html) package, which provides optimized C++ implementations of rolling window functions.  This allows users to quickly extract meaningful movement dynamics metrics from their accelerometer data, even when dealing with extensive recordings.
+Accelerometer data is often collected at high frequencies, resulting in large datasets.  The {rabbit} package is designed for efficient rolling window calculations. Compared to the original code ingerited by the team, it is 1000-2000 times faster. This means that processing a file that previously took > 1 day can now be done in just less than a minute. This makes it feasible to process large datasets of accelerometer data in a reasonable time frame. Speed gains are achieved via effective design combined with the use of the [{RcppRoll}](https://cran.r-project.org/web/packages/RcppRoll/index.html) package, which provides optimized C++ implementations of rolling window functions.  This allows users to quickly extract meaningful movement dynamics metrics from their accelerometer data, even when dealing with extensive recordings.
 
 ## Installation
 
@@ -52,11 +49,12 @@ library(rabbit)
 library(dplyr)
 library(ggplot2)
 
-file_in = system.file("extdata", "raw_Pic2Jan_50000.parquet", package = "rabbit")
+file_in <- system.file("extdata", "raw_Pic2Jan_50000.parquet", package = "rabbit")
 
 df <- 
   standardize_data(file_in = file_in, vars = c("Timestamp","accX","accY","accZ")) |> 
-  extract_movement_dynamics()
+  extract_movement_dynamics() |>
+  crop_ends_diurnal()
 
 nrow(df)
 
