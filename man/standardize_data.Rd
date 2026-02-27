@@ -8,8 +8,8 @@
 standardize_data(
   df,
   file_in = NULL,
-  file_out = NULL,
   vars = c("Timestamp", "X", "Y", "Z"),
+  time_function = lubridate::dmy_hms,
   timezone = "Australia/Adelaide",
   ...
 )
@@ -17,8 +17,8 @@ standardize_data(
 standardise_data(
   df,
   file_in = NULL,
-  file_out = NULL,
   vars = c("Timestamp", "X", "Y", "Z"),
+  time_function = lubridate::dmy_hms,
   timezone = "Australia/Adelaide",
   ...
 )
@@ -28,9 +28,9 @@ standardise_data(
 
 \item{file_in}{A string representing the path to the input file (CSV or parquet).}
 
-\item{file_out}{path where the output file should be saved. If NULL, the data will not be saved to a file. The output format will be determined by the file extension (CSV or parquet).}
-
 \item{vars}{A character vector of length 4 specifying the names of the columns in df that contain the variables \code{time}, \code{X}, \code{Y}, \code{Z} from the  accelerometer. The default is c("Timestamp","X","Y","Z").}
+
+\item{time_function}{A function to convert the time column to POSIXct. The default is lubridate::dmy_hms, which parses date-times with year, month, and day, hour, minute, and second components.}
 
 \item{timezone}{Timezone of where accelerometer was used}
 
@@ -40,8 +40,8 @@ standardise_data(
 A data frame containing the standardised data, with the time column converted to POSIXct type.
 }
 \description{
-This function accpets either a dataframe or filename (*.csv or *.parquet), checks that the time and x,y,z columncan be properly processed,
-and prints out summary statistics about the data.
+This function accepts either a dataframe or filename (*.csv or *.parquet), checks that the time and x,y,z columns can be properly processed,
+auto-detects common timestamp formats, and prints out summary statistics about the data.
 }
 \examples{
 file_in = system.file("extdata", "raw_Pic2Jan_50000.parquet", package = "rabbit")

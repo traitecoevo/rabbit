@@ -1,12 +1,12 @@
 #' Standardize accelerometer data
 #'
-#' This function accpets either a dataframe or filename (*.csv or *.parquet), checks that the time and x,y,z columncan be properly processed,
-#' and prints out summary statistics about the data. 
+#' This function accepts either a dataframe or filename (*.csv or *.parquet), checks that the time and x,y,z columns can be properly processed,
+#' auto-detects common timestamp formats, and prints out summary statistics about the data.
 #' @param df A data frame containing the data
 #' @param file_in A string representing the path to the input file (CSV or parquet).
-#' @param file_out path where the output file should be saved. If NULL, the data will not be saved to a file. The output format will be determined by the file extension (CSV or parquet).
 #' @param vars A character vector of length 4 specifying the names of the columns in df that contain the variables `time`, `X`, `Y`, `Z` from the  accelerometer. The default is c("Timestamp","X","Y","Z").
 #' @param timezone Timezone of where accelerometer was used
+#' @param time_function A function to convert the time column to POSIXct. The default is lubridate::dmy_hms, which parses date-times with year, month, and day, hour, minute, and second components.
 #' @param ... Other arguments to pass into read in function
 #' @rdname standardize_data 
 #' @return A data frame containing the standardised data, with the time column converted to POSIXct type.
@@ -15,10 +15,10 @@
 #' file_in = system.file("extdata", "raw_Pic2Jan_50000.parquet", package = "rabbit")
 #' df <-
 #'   standardize_data(file_in = file_in, vars = c("Timestamp", "accX", "accY", "accZ"))
-
 standardize_data <- function(df, 
-                                file_in = NULL, file_out = NULL, 
+                                file_in = NULL,
                                 vars = c("Timestamp","X","Y","Z"), 
+                                time_function = lubridate::dmy_hms,
                                 timezone="Australia/Adelaide", 
                                 ...) {
 
@@ -29,7 +29,8 @@ standardize_data <- function(df,
       stop("The file does not exist.")
     }
 
-    df <- switch(tools::file_ext(file_in),
+    df <- switch(
+      tools::file_ext(file_in),
       "csv" = data.table::fread(file_in, ...),
       "parquet" = arrow::read_parquet(file_in, ...)
       )
@@ -58,21 +59,15 @@ standardize_data <- function(df,
       z = vars[4]
     ))
   )
-  
+
   # Convert the date column to POSIXct (date-time) type using lubridate
-  df$time <- lubridate::dmy_hms(df$time, tz = timezone)
+  if(!lubridate::is.POSIXct(df$time)) {
+    df$time <- time_function(df$time, tz = timezone)
+  }
 
   # Check if there are any NA values after conversion
   if (any(is.na(df$time))) {
     stop("Some dates could not be processed. Please check the date format.")
-  }
-  
-  if(!is.null(file_out)) {
-    switch(tools::file_ext(file_out),
-      "csv" = data.table::fwrite(df, file_out, ...),
-      "parquet" = arrow::write_parquet(df, file_out, ...)
-    )
-    cat("File saved as:", file_out, "\n")
   }
 
   # Return the data frame
@@ -82,3 +77,4 @@ standardize_data <- function(df,
 #' @rdname standardize_data
 #' @export
 standardise_data <- standardize_data
+

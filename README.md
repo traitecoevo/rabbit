@@ -100,6 +100,38 @@ df_mvt |> filter(!is.na(time)) |>
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
 
+## Benchmark fast vs base methods
+
+You can compare performance of the `fast` (RcppRoll) and `base` (pure R)
+implementations for both rolling sums and full movement dynamics
+extraction:
+
+``` r
+set.seed(123)
+n <- 100000
+timestamp <- as.POSIXct("2024-01-01 00:00:00", tz = "UTC") + seq_len(n) - 1
+
+fake_raw <- data.frame(
+  Timestamp = format(timestamp, "%d/%m/%Y %H:%M:%S"),
+  accX = rnorm(n, mean = 0, sd = 0.1),
+  accY = rnorm(n, mean = 0, sd = 0.1),
+  accZ = rnorm(n, mean = 1, sd = 0.1)
+)
+
+df_std <- standardize_data(fake_raw, vars = c("Timestamp", "accX", "accY", "accZ"), timezone = "UTC")
+
+bench <- benchmark_movement_dynamics(df_std, window_size = 50, iterations = 3)
+bench
+#> # A tibble: ...
+
+benchmark_movement_dynamics_summary(bench)
+#> # A tibble: 2 x 4
+#>   task                      median_fast_sec median_base_sec speedup_base_over_fast
+#>   <chr>                               <dbl>           <dbl>                  <dbl>
+#> 1 extract_movement_dynamics           ...             ...                    ...
+#> 2 roll_sum                            ...             ...                    ...
+```
+
 ## Classifying behaviour
 
 Data is now ready for classification of behaviour using your own

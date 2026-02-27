@@ -77,6 +77,31 @@ df_mvt |> filter(!is.na(time)) |>
   geom_point(size = 0.2) + theme_classic()
 ```
 
+## Benchmark fast vs base methods
+
+You can compare performance of the `fast` (RcppRoll) and `base` (pure R)
+implementations for both rolling sums and full movement dynamics extraction:
+
+```{r}
+set.seed(123)
+n <- 10000
+timestamp <- as.POSIXct("2024-01-01 00:00:00", tz = "UTC") + seq_len(n) - 1
+
+fake_raw <- data.frame(
+  Timestamp = format(timestamp, "%d/%m/%Y %H:%M:%S"),
+  accX = rnorm(n, mean = 0, sd = 0.1),
+  accY = rnorm(n, mean = 0, sd = 0.1),
+  accZ = rnorm(n, mean = 1, sd = 0.1)
+)
+
+df_std <- standardize_data(fake_raw, vars = c("Timestamp", "accX", "accY", "accZ"), timezone = "UTC")
+
+bench <- benchmark_movement_dynamics(df_std, window_size = 50, iterations = 3)
+
+bench |> dplyr::group_by(task, method) |> dplyr::summarise(median_sec = median(elapsed_sec))
+
+```
+
 ## Classifying behaviour
 
 Data is now ready for classification of behaviour using your own behavioural classifier

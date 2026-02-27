@@ -19,3 +19,49 @@ test_that("extract_movement_dynamics computes rolling metrics", {
   expect_equal(out$meanODBA[5], 15)
   expect_equal(out$corXY[5], 1, tolerance = 1e-12)
 })
+
+test_that("roll_sum_base matches roll_sum", {
+  x <- rnorm(1000)
+  n <- 3
+
+  expect_equal(roll_sum_base(x, n), roll_sum(x, n))
+  expect_equal(roll_min_base(x, n), roll_min(x, n))
+  expect_equal(roll_max_base(x, n), roll_max(x, n))
+ 
+  expect_error(roll_sum_base(c(x, "NA"), n))
+  expect_error(roll_sum_base("not numeric", n))
+  expect_error(roll_sum_base(x, "not numeric"))
+  expect_error(roll_sum_base(x, NA))
+  expect_error(roll_sum_base(x, 0))
+})
+
+test_that("extract_movement_dynamics base matches fast", {
+  df <- data.frame(
+    time = as.POSIXct("2020-02-01 00:00:00", tz = "UTC") + 0:49,
+    x = rnorm(50),
+    y = rnorm(50),
+    z = rnorm(50)
+  )
+
+  out_fast <- extract_movement_dynamics(df, window_size = 5, method = "fast")
+  out_base <- extract_movement_dynamics(df, window_size = 5, method = "base")
+
+  expect_equal(out_base, out_fast, tolerance = 1e-12)
+})
+
+test_that("benchmark_movement_dynamics returns expected structure", {
+  df <- data.frame(
+    time = as.POSIXct("2020-02-01 00:00:00", tz = "UTC") + 0:99,
+    x = rnorm(100),
+    y = rnorm(100),
+    z = rnorm(100)
+  )
+
+  expect_no_error(
+    out <- benchmark_movement_dynamics(df, window_size = 5, iterations = 2)
+  )
+
+  expect_equal(nrow(out), 6)
+  expect_true(all(c("task", "method", "iteration", "elapsed_sec") %in% names(out)))
+  expect_true(all(out$elapsed_sec >= 0))
+})
