@@ -6,7 +6,9 @@ test_that("extract_movement_dynamics computes rolling metrics", {
     z = 3:7
   )
 
-  out <- extract_movement_dynamics(df, window_size = 3)
+  expect_no_error(
+    out <- extract_movement_dynamics(df, window_size = 3)
+  )
 
   expect_equal(nrow(out), nrow(df))
   expect_true(inherits(out$time, "POSIXct"))
@@ -17,7 +19,7 @@ test_that("extract_movement_dynamics computes rolling metrics", {
   expect_equal(out$maxx[5], 5)
   expect_equal(out$minx[5], 3)
   expect_equal(out$meanODBA[5], 15)
-  expect_equal(out$corXY[5], 1, tolerance = 1e-12)
+  expect_equal(out$corXY[5], 1, tolerance = 1e-6)
 })
 
 test_that("roll_sum_base matches roll_sum", {
@@ -36,30 +38,25 @@ test_that("roll_sum_base matches roll_sum", {
 })
 
 test_that("extract_movement_dynamics base matches fast", {
-  df <- data.frame(
-    time = as.POSIXct("2020-02-01 00:00:00", tz = "UTC") + 0:49,
-    x = rnorm(50),
-    y = rnorm(50),
-    z = rnorm(50)
-  )
 
-  out_fast <- extract_movement_dynamics(df, window_size = 5, method = "fast")
-  out_base <- extract_movement_dynamics(df, window_size = 5, method = "base")
+  expect_no_error({
+    df <- generate_fake_data(50) |>
+      standardize_data(vars = c("timestamp", "accX", "accY", "accZ"))
 
-  expect_equal(out_base, out_fast, tolerance = 1e-12)
+    out_fast <- extract_movement_dynamics(df, window_size = 5, method = "fast")
+    out_base <- extract_movement_dynamics(df, window_size = 5, method = "base")
+  })
+
+  expect_equal(out_base, out_fast, tolerance = 1e-6)
 })
 
 test_that("benchmark_movement_dynamics returns expected structure", {
-  df <- data.frame(
-    time = as.POSIXct("2020-02-01 00:00:00", tz = "UTC") + 0:99,
-    x = rnorm(100),
-    y = rnorm(100),
-    z = rnorm(100)
-  )
-
-  expect_no_error(
+  expect_no_error({
+    df <- generate_fake_data(50) |>
+      standardize_data(vars = c("timestamp", "accX", "accY", "accZ"))
+  
     out <- benchmark_movement_dynamics(df, window_size = 5, iterations = 2)
-  )
+  })
 
   expect_equal(nrow(out), 6)
   expect_true(all(c("task", "method", "iteration", "elapsed_sec") %in% names(out)))

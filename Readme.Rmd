@@ -3,7 +3,7 @@ output: github_document
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file 
-To regenerate, run `quarto::quarto_render("Readme.Rmd", output_file = "README.md")`
+To regenerate, run `quarto::quarto_render("Readme.Rmd", output_file = "Readme.md")`
 -->
 
 ```{r, include = FALSE}
@@ -22,10 +22,16 @@ knitr::opts_chunk$set(
 <!-- [![codecov](https://codecov.io/gh/traitecoevo/rabbit/branch/master/graph/badge.svg?token=JT1M0AMZ44)](https://codecov.io/gh/traitecoevo/rabbit) -->
 <!-- badges: end -->
 
-The package `rabbit` provides functions to standardise raw accelerometer data and extract movement dynamics from it. Accelerometer data is often collected in a raw format that may not be immediately suitable for analysis. The `standardize_data` function reads in raw accelerometer data, standardises the column names, and converts the timestamp to a consistent format. The `extract_movement_dynamics` function takes the standardised data and calculates various movement dynamics metrics, such as mean acceleration, variance, covariance, Overall Dynamic Body Acceleration (ODBA), and Vectorial Dynamic Body Acceleration (VDBA) using rolling window calculations. The data is then returned in a tidy format, ready for further analysis or classification of behaviour.
+The package {rabbit} provides functions to standardise raw accelerometer data and extract movement dynamics from it. Accelerometer data is often collected in a raw format that may not be immediately suitable for analysis. 
 
-Accelerometer data is often collected at high frequencies, resulting in large datasets. The `rabbit` package is designed to efficiently process these large datasets by leveraging the `RcppRoll` package for optimized rolling window calculations. This allows users to quickly extract meaningful movement dynamics metrics from their accelerometer data, even when dealing with extensive recordings.
+The `standardize_data` function reads in raw accelerometer data, standardises the column names, and converts the timestamp to a consistent format. 
 
+The `extract_movement_dynamics` function takes the standardised data and calculates various movement dynamics metrics, such as mean acceleration, variance, covariance, Overall Dynamic Body Acceleration (ODBA), and Vectorial Dynamic Body Acceleration (VDBA) using rolling window calculations. The data is then returned in a tidy format, ready for further analysis or classification of behaviour.
+
+Accelerometer data is often collected at high frequencies, resulting in large datasets. The {rabbit} package is designed to efficiently process these large datasets
+
+
+The {rabbit} package is designed for efficient rolling window calculations. Compared to the original code ingerited by the team, it is 1000-2000 times faster. This means that processing a file that previously took > 1 day can now be done in just less than a minute. This makes it feasible to process large datasets of accelerometer data in a reasonable time frame. Speed gains are achieved via effective design combined with the use of the [{RcppRoll}](https://cran.r-project.org/web/packages/RcppRoll/index.html) package, which provides optimized C++ implementations of rolling window functions.  This allows users to quickly extract meaningful movement dynamics metrics from their accelerometer data, even when dealing with extensive recordings.
 
 ## Installation
 
@@ -44,6 +50,7 @@ This is a basic example file is less than one hour of a bilby called piccolo:
 ```{r example}
 library(rabbit)
 library(dplyr)
+library(ggplot2)
 
 file_in = system.file("extdata", "raw_Pic2Jan_50000.parquet", package = "rabbit")
 
@@ -53,6 +60,7 @@ df <-
 
 nrow(df)
 
+# first rows of data are NA because of rolling window calculations
 df |> filter(!is.na(time))
 ```
 
@@ -64,46 +72,37 @@ df <- arrow::read_parquet(file_in)
 df_std <- standardize_data(df, vars = c("Timestamp","accX","accY","accZ"))
 df_mvt <- extract_movement_dynamics(df_std)
 
+df_mvt |> filter(!is.na(time))
 ```
+
+## Classifying behaviour
+
+Data is now ready for classification of behaviour using your own behavioural classifier.
 
 ## Identifying high sumVDBA times
 
 sumVDBA is the best measure we have of heat-generating movement or activities:
 
 ```{r,warning=FALSE}
-library(ggplot2)
 df_mvt |> filter(!is.na(time)) |>
   ggplot(aes(x = time, y = sumVDBA)) +
   geom_point(size = 0.2) + theme_classic()
 ```
 
-## Benchmark fast vs base methods
+## Benchmarking speed gains
 
-You can compare performance of the `fast` (RcppRoll) and `base` (pure R)
-implementations for both rolling sums and full movement dynamics extraction:
+ Compared to the original code ingerited by the team, the {rabbit} package is 1000-2000 times faster. This means that processing a file that previously took > 1 day can now be done in just less than a minute. Much of this gain is via efficient design, but the use of the [{RcppRoll}](https://cran.r-project.org/web/packages/RcppRoll/index.html) package also contributes to speed gains. The {RcppRoll} implementation is about 10-20 times faster than a pure R implementation of rolling sums.
+
+We can compare performance of the `fast` (RcppRoll) `base` (pure R), and `orig` (original code)
+implementations for extracting movement dynamics.
 
 ```{r}
-set.seed(123)
-n <- 10000
-timestamp <- as.POSIXct("2024-01-01 00:00:00", tz = "UTC") + seq_len(n) - 1
+bench <- 
+  generate_fake_data(n = 1000) |>
+  standardize_data(vars = c("timestamp", "accX", "accY", "accZ")) |>
+  benchmark_movement_dynamics()
 
-fake_raw <- data.frame(
-  Timestamp = format(timestamp, "%d/%m/%Y %H:%M:%S"),
-  accX = rnorm(n, mean = 0, sd = 0.1),
-  accY = rnorm(n, mean = 0, sd = 0.1),
-  accZ = rnorm(n, mean = 1, sd = 0.1)
-)
-
-df_std <- standardize_data(fake_raw, vars = c("Timestamp", "accX", "accY", "accZ"), timezone = "UTC")
-
-bench <- benchmark_movement_dynamics(df_std, window_size = 50, iterations = 3)
-
-bench |> dplyr::group_by(task, method) |> dplyr::summarise(median_sec = median(elapsed_sec))
-
+bench |> 
+  dplyr::group_by(task, method) |> 
+  dplyr::summarise(median_sec = median(elapsed_sec))
 ```
-
-## Classifying behaviour
-
-Data is now ready for classification of behaviour using your own behavioural classifier
-
-

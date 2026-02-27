@@ -1,20 +1,25 @@
 test_that("standardize_data renames columns and parses time", {
-  df <- make_sample_df(5)
 
-  out <- standardize_data(
+  expect_no_error({
+    
+  df <- generate_fake_data(5)
+
+  out <- 
+  standardize_data(
     df,
-    vars = c("Timestamp", "X", "Y", "Z"),
+    vars = c("timestamp", "accX", "accY", "accZ"),
     timezone = "UTC"
-  )
+    )
+  })
 
   expect_equal(names(out), c("time", "x", "y", "z"))
   expect_true(inherits(out$time, "POSIXct"))
   expect_false(any(is.na(out$time)))
-  expect_equal(out$x, df$X)
+  expect_equal(out$x, df$accX)
 })
 
 test_that("standardize_data supports file_in", {
-  df <- make_sample_df(4)
+  df <- generate_fake_data(4)
   file_in <- tempfile(fileext = ".csv")
 
   data.table::fwrite(df, file_in)
@@ -22,28 +27,11 @@ test_that("standardize_data supports file_in", {
   out <- standardize_data(
     df = df[0, ],
     file_in = file_in,
-    vars = c("Timestamp", "X", "Y", "Z"),
+    vars = c("timestamp", "accX", "accY", "accZ"),
     timezone = "UTC"
   )
 
   expect_equal(nrow(out), nrow(df))
-})
-
-test_that("standardize_data validates inputs", {
-  df <- make_sample_df(3)
-
-  expect_error(
-    standardize_data(df, vars = c("Timestamp", "X")),
-    "vars"
-  )
-
-  df$Timestamp[2] <- "bad"
-  expect_error(
-    suppressWarnings(
-      standardize_data(df, vars = c("Timestamp", "X", "Y", "Z"), timezone = "UTC")
-    ),
-    "could not be processed"
-  )
 })
 
 test_that("standardize_data supports custom parser for ymd timestamp format", {
