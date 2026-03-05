@@ -1,4 +1,4 @@
-#' Standardize accelerometer data
+#' Standardise accelerometer data
 #'
 #' This function accepts either a dataframe or filename (*.csv or *.parquet), checks that the time and x,y,z columns can be properly processed,
 #' auto-detects common timestamp formats, and prints out summary statistics about the data.
@@ -8,14 +8,14 @@
 #' @param timezone Timezone of where accelerometer was used
 #' @param time_function A function to convert the time column to POSIXct. The default is lubridate::dmy_hms, which parses date-times with year, month, and day, hour, minute, and second components.
 #' @param ... Other arguments to pass into read in function
-#' @rdname standardize_data 
+#' @rdname standardise_data 
 #' @return A data frame containing the standardised data, with the time column converted to POSIXct type.
 #' @export
 #' @examples
 #' file_in = system.file("extdata", "raw_Pic2Jan_50000.parquet", package = "rabbit")
 #' df <-
-#'   standardize_data(file_in = file_in, vars = c("Timestamp", "accX", "accY", "accZ"))
-standardize_data <- function(df, 
+#'   standardise_data(file_in = file_in, vars = c("Timestamp", "accX", "accY", "accZ"))
+standardise_data <- function(df, 
                                 file_in = NULL,
                                 vars = c("Timestamp","X","Y","Z"), 
                                 time_function = lubridate::dmy_hms,
@@ -74,7 +74,6 @@ standardize_data <- function(df,
   return(df)
 }
 
-#' @rdname standardize_data
+#' @rdname standardise_data
 #' @export
-standardise_data <- standardize_data
-
+standardize_data <- standardise_data

@@ -1,11 +1,11 @@
-test_that("standardize_data renames columns and parses time", {
+test_that("standardise_data renames columns and parses time", {
 
   expect_no_error({
     
   df <- generate_fake_data(5)
 
   out <- 
-  standardize_data(
+  standardise_data(
     df,
     vars = c("timestamp", "accX", "accY", "accZ"),
     timezone = "UTC"
@@ -18,13 +18,13 @@ test_that("standardize_data renames columns and parses time", {
   expect_equal(out$x, df$accX)
 })
 
-test_that("standardize_data supports file_in", {
+test_that("standardise_data supports file_in", {
   df <- generate_fake_data(4)
   file_in <- tempfile(fileext = ".csv")
 
   data.table::fwrite(df, file_in)
 
-  out <- standardize_data(
+  out <- standardise_data(
     df = df[0, ],
     file_in = file_in,
     vars = c("timestamp", "accX", "accY", "accZ"),
@@ -34,14 +34,14 @@ test_that("standardize_data supports file_in", {
   expect_equal(nrow(out), nrow(df))
 })
 
-test_that("standardize_data supports custom parser for ymd timestamp format", {
+test_that("standardise_data supports custom parser for ymd timestamp format", {
   df <- make_sample_df(4)
   df$Timestamp <- format(
     lubridate::dmy_hms(df$Timestamp, tz = "UTC"),
     "%Y-%m-%d %H:%M:%S"
   )
 
-  out <- standardize_data(
+  out <- standardise_data(
     df,
     vars = c("Timestamp", "X", "Y", "Z"),
     time_function = lubridate::ymd_hms,
@@ -52,7 +52,7 @@ test_that("standardize_data supports custom parser for ymd timestamp format", {
   expect_false(any(is.na(out$time)))
 })
 
-test_that("standardize_data supports custom parser for unix epoch milliseconds", {
+test_that("standardise_data supports custom parser for unix epoch milliseconds", {
   base_time <- as.POSIXct("2020-02-01 00:00:00", tz = "UTC") + seq(0, by = 60, length.out = 4)
   df <- data.frame(
     Timestamp = as.numeric(base_time) * 1000,
@@ -61,7 +61,7 @@ test_that("standardize_data supports custom parser for unix epoch milliseconds",
     Z = 3:6
   )
 
-  out <- standardize_data(
+  out <- standardise_data(
     df,
     vars = c("Timestamp", "X", "Y", "Z"),
     time_function = function(x, tz) as.POSIXct(x / 1000, origin = "1970-01-01", tz = tz),
@@ -71,7 +71,7 @@ test_that("standardize_data supports custom parser for unix epoch milliseconds",
   expect_equal(out$time, base_time)
 })
 
-test_that("standardize_data does not reparse POSIXct timestamps", {
+test_that("standardise_data does not reparse POSIXct timestamps", {
   base_time <- as.POSIXct("2020-02-01 00:00:00", tz = "UTC") + seq(0, by = 60, length.out = 4)
   df <- data.frame(
     Timestamp = base_time,
@@ -80,7 +80,7 @@ test_that("standardize_data does not reparse POSIXct timestamps", {
     Z = 3:6
   )
 
-  out <- standardize_data(
+  out <- standardise_data(
     df,
     vars = c("Timestamp", "X", "Y", "Z"),
     timezone = "UTC",
@@ -91,10 +91,10 @@ test_that("standardize_data does not reparse POSIXct timestamps", {
   expect_true(inherits(out$time, "POSIXct"))
 })
 
-test_that("standardise_data is an alias", {
+test_that("standardize_data is an alias", {
   df <- make_sample_df(2)
 
-  out <- standardise_data(
+  out <- standardize_data(
     df,
     vars = c("Timestamp", "X", "Y", "Z"),
     timezone = "UTC"

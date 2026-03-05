@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 
 The package {rabbit} provides functions to standardise raw accelerometer data and extract movement dynamics from it. Accelerometer data is often collected in a raw format that may not be immediately suitable for analysis. 
 
-* `standardize_data`: reads in raw accelerometer data, standardises the column names, and converts the timestamp to a consistent format. 
+* `standardise_data`: reads in raw accelerometer data, standardises the column names, and converts the timestamp to a consistent format. 
 * `extract_movement_dynamics`: function takes the standardised data and calculates various movement dynamics metrics, such as mean acceleration, variance, covariance, Overall Dynamic Body Acceleration (ODBA), and Vectorial Dynamic Body Acceleration (VDBA) using rolling window calculations. The data is then returned in a tidy format, ready for further analysis or classification of behaviour.
 * `crop_ends`, `crop_diurnal`, and `crop_nocturnal`: Useful for removing records that are outside of the desired time window, such as records collected before the device was attached or after it was removed.
 
@@ -52,7 +52,7 @@ library(ggplot2)
 file_in <- system.file("extdata", "raw_Pic2Jan_50000.parquet", package = "rabbit")
 
 df <- 
-  standardize_data(file_in = file_in, vars = c("Timestamp","accX","accY","accZ")) |> 
+  standardise_data(file_in = file_in, vars = c("Timestamp","accX","accY","accZ")) |> 
   extract_movement_dynamics() |>
   crop_ends_diurnal()
 
@@ -67,7 +67,7 @@ Alternatively, you can read in the data and then standardise it:
 ```{r}
 library(arrow)
 df <- arrow::read_parquet(file_in)
-df_std <- standardize_data(df, vars = c("Timestamp","accX","accY","accZ"))
+df_std <- standardise_data(df, vars = c("Timestamp","accX","accY","accZ"))
 df_mvt <- extract_movement_dynamics(df_std)
 
 df_mvt |> filter(!is.na(time))
@@ -97,7 +97,7 @@ implementations for extracting movement dynamics.
 ```{r}
 bench <- 
   generate_fake_data(n = 1000) |>
-  standardize_data(vars = c("timestamp", "accX", "accY", "accZ")) |>
+  standardise_data(vars = c("timestamp", "accX", "accY", "accZ")) |>
   benchmark_movement_dynamics()
 
 bench |> 
