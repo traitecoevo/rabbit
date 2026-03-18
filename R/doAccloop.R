@@ -4,7 +4,7 @@
 ## doAccloop_all is a wrapepr toe enabl clauclations over sliding windows, similar to what was implemented previously
 
 doAccloop_all <- function(dat1, window_size = 50) {
-
+  dat1 <- as.data.frame(dat1)  # convert tibble to data frame
   i <- seq(nrow(dat1))
   dfs <- purrr::map(i, ~ dplyr::slice(dat1, .x + seq_len(window_size) - 1))
 
