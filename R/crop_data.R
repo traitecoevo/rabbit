@@ -11,21 +11,23 @@ crop_ends <- function(df, start_time = "00:00:00", end_time   = "24:00:00") {
   # first rows with time > start_time and last rows with time < end_time are retained. 
   time <- format(df$time, "%H:%M:%S")
 
-  start_i <- which(!is.na(time) & time >= start_time)
-  if(length(start_i) == 0) {
-    start_i <- nrow(df)
+  start_i <- which(!is.na(time) & time == start_time)
+  if (length(start_i) == 0) {
+    warning("No exact match for start_time found, retaining all rows from beginning.")
+    start_i <- 1
   } else {
     start_i <- min(start_i)
   }
 
   # if there are no times after end_time, then end_i is set to nrow(df) to retain all rows after start_i. Otherwise, end_i is set to the last row with time < end_time.
-  end_i <- which(!is.na(time) &  time <= end_time)
-  if(length(end_i) == 0) {
+  end_i <- which(!is.na(time) & time == end_time)
+  if (length(end_i) == 0) {
+    warning("No exact match for end_time found, retaining all rows to end.")
     end_i <- nrow(df)
   } else {
     end_i <- max(end_i)
   }
-
+  
   df |>
     dplyr::slice(start_i:end_i)
 }
