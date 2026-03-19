@@ -15,92 +15,171 @@ knitr::opts_chunk$set(
 )
 ```
 
-# rabbit
+# rabbit <img src="man/figures/logo.png" align="right" height="139"/>
 
-<!-- badges: start -->
-[![R-CMD-check](https://github.com/traitecoevo/rabbit/actions/workflows/R-CMD-check.yml/badge.svg)](https://github.com/traitecoevo/rabbit/actions/workflows/R-CMD-check.yml)
-<!-- [![codecov](https://codecov.io/gh/traitecoevo/rabbit/branch/master/graph/badge.svg?token=JT1M0AMZ44)](https://codecov.io/gh/traitecoevo/rabbit) -->
-<!-- badges: end -->
+The `{rabbit}` package provides functions to standardise raw tri-axial accelerometer data and extract movement dynamic metrics from it. Accelerometer data is often collected in a raw format that may not be immediately suitable for analysis.
 
-The package {rabbit} provides functions to standardise raw accelerometer data and extract movement dynamics from it. Accelerometer data is often collected in a raw format that may not be immediately suitable for analysis. 
+- `standardise_data()` reads in raw accelerometer data, standardises column names, and converts the timestamp to a consistent format.
+- `extract_movement_dynamics()` takes the standardised data and calculates various movement dynamics metrics using rolling window calculations, including mean acceleration, variance, covariance, Overall Dynamic Body Acceleration (ODBA), and Vectorial Dynamic Body Acceleration (VDBA).
+- `crop_ends()`, `crop_ends_diurnal()`, and `crop_ends_nocturnal()`useful for removing records that are outside of the desired time window, such as records collected before the device was fitted or after it was removed.
 
-* `standardise_data`: reads in raw accelerometer data, standardises the column names, and converts the timestamp to a consistent format. 
-* `extract_movement_dynamics`: function takes the standardised data and calculates various movement dynamics metrics, such as mean acceleration, variance, covariance, Overall Dynamic Body Acceleration (ODBA), and Vectorial Dynamic Body Acceleration (VDBA) using rolling window calculations. The data is then returned in a tidy format, ready for further analysis or classification of behaviour.
-* `crop_ends`, `crop_diurnal`, and `crop_nocturnal`: Useful for removing records that are outside of the desired time window, such as records collected before the device was attached or after it was removed.
+## Speed
 
-Accelerometer data is often collected at high frequencies, resulting in large datasets.  The {rabbit} package is designed for efficient rolling window calculations. Compared to the original code ingerited by the team, it is 1000-2000 times faster. This means that processing a file that previously took > 1 day can now be done in just less than a minute. This makes it feasible to process large datasets of accelerometer data in a reasonable time frame. Speed gains are achieved via effective design combined with the use of the [{RcppRoll}](https://cran.r-project.org/web/packages/RcppRoll/index.html) package, which provides optimized C++ implementations of rolling window functions.  This allows users to quickly extract meaningful movement dynamics metrics from their accelerometer data, even when dealing with extensive recordings.
+Accelerometer data is often collected at high frequencies, usually 10 to 50Hz, resulting in large datasets. Compared to the original code inherited by the team, `{rabbit}` is **1000–2000 times faster**. A file that previously took over a day to process can now be done in under a minute. Speed gains come from efficient design combined with the `{RcppRoll}` package, which provides optimised C++ implementations of rolling window functions.
 
 ## Installation
 
 You can install the development version of `rabbit` from GitHub using the `remotes` package:
-
-```{r install, eval=FALSE}
+```r
 # install.packages("remotes")
 remotes::install_github("traitecoevo/rabbit")
 ```
 
 ## Example
 
-This is a basic example file is less than one hour of a bilby called piccolo:
-
-
-```{r example}
+This basic example uses less than one hour of data from a bilby called Piccolo:
+```r
 library(rabbit)
 library(dplyr)
-library(ggplot2)
 
 file_in <- system.file("extdata", "raw_Pic2Jan_50000.parquet", package = "rabbit")
 
-df <- 
-  standardise_data(file_in = file_in, vars = c("Timestamp","accX","accY","accZ")) |> 
-  extract_movement_dynamics() |>
-  crop_ends_diurnal()
+df <- standardise_data(file_in = file_in, vars = c("Timestamp", "accX", "accY", "accZ")) |>
+  extract_movement_dynamics()
 
-nrow(df)
-
-# first rows of data are NA because of rolling window calculations
+# First rows are NA due to rolling window calculations
 df |> filter(!is.na(time))
 ```
 
-Alternatively, you can read in the data and then standardise it:
-
-```{r}
+Alternatively, you can read in the data first and then standardise it:
+```r
 library(arrow)
+
 df <- arrow::read_parquet(file_in)
-df_std <- standardise_data(df, vars = c("Timestamp","accX","accY","accZ"))
-df_mvt <- extract_movement_dynamics(df_std)
+
+df_mvt <- standardise_data(df, vars = c("Timestamp", "accX", "accY", "accZ")) |>
+  extract_movement_dynamics()
 
 df_mvt |> filter(!is.na(time))
 ```
 
-## Classifying behaviour
+The following code loops through all files within a folder and extracts the animal ID from the file name using the `{stringr}` package. For ID extraction, files should be labelled with the animal ID followed by `_`.
+```r
+library(stringr)
+library(arrow)
 
-Data is now ready for classification of behaviour using your own behavioural classifier.
+csv_files <- list.files(path = "/Raw", pattern = "*.csv", full.names = TRUE)
 
-## Identifying high sumVDBA times
+# Create output folder if it doesn't exist
+dir.create("/Processed", showWarnings = FALSE)
 
-sumVDBA is the best measure we have of heat-generating movement or activities:
+# Loop through each .csv file, calculate, and save the results
+for (csv_file in csv_files) {
+  cat("Processing:", csv_file, "\n")
 
-```{r,warning=FALSE}
-df_mvt |> filter(!is.na(time)) |>
-  ggplot(aes(x = time, y = sumVDBA)) +
-  geom_point(size = 0.2) + theme_classic()
+  # Extract ID from filename
+  file_name <- tools::file_path_sans_ext(basename(csv_file))
+  animal_id <- stringr::str_split(file_name, "_")[[1]][1]
+
+  result <- standardise_data(file_in = csv_file,
+                             vars = c("Timestamp", "X", "Y", "Z"),
+                             time_function = lubridate::dmy_hms) |>
+    extract_movement_dynamics(window_size = 25)
+
+  result$ID <- animal_id
+  result <- dplyr::relocate(result, ID)
+
+  output_file <- sub("Raw", "Processed", csv_file) |>
+    sub(pattern = "\\.csv$", replacement = ".parquet")
+
+  arrow::write_parquet(result, output_file)
+
+  cat("Saved:", output_file, "\n\n")
+  gc()
+}
 ```
 
-## Benchmarking speed gains
+Files can then be cropped to remove records at the start and end of each file. This is useful for removing records collected before the device was attached or after it was removed.
 
- Compared to the original code ingerited by the team, the {rabbit} package is 1000-2000 times faster. This means that processing a file that previously took > 1 day can now be done in just less than a minute. Much of this gain is via efficient design, but the use of the [{RcppRoll}](https://cran.r-project.org/web/packages/RcppRoll/index.html) package also contributes to speed gains. The {RcppRoll} implementation is about 10-20 times faster than a pure R implementation of rolling sums.
+- `crop_ends()` removes all records before the first instance of a specified time and after the last instance of a specified time
+- `crop_ends_diurnal()` removes all records before the first instance of 01:00:00 and after the last instance of 01:00:00
+- `crop_ends_nocturnal()` removes all records before the first instance of 12:00:00 and after the last instance of 12:00:00
+```r
+# List all .parquet files in folder
+parquet_files <- list.files(path = "/Processed", pattern = "\\.parquet$", full.names = TRUE)
 
-We can compare performance of the `fast` (RcppRoll) `base` (pure R), and `orig` (original code)
-implementations for extracting movement dynamics.
+# Create output folder if it doesn't exist
+dir.create("/Cropped", showWarnings = FALSE)
 
-```{r}
-bench <- 
-  generate_fake_data(n = 1000) |>
-  standardise_data(vars = c("timestamp", "accX", "accY", "accZ")) |>
+# Create an empty list to collect summary rows
+summary_list <- vector("list", length(parquet_files))
+
+for (i in seq_along(parquet_files)) {
+
+  parquet_file <- parquet_files[i]
+  cat("Processing:", parquet_file, "\n")
+
+  # Load and remove incomplete time rows
+  df <- arrow::read_parquet(parquet_file) |>
+    filter(!is.na(time))
+
+  # Crop each file with desired crop_ends() function
+  result2 <- crop_ends_nocturnal(df)
+  rm(df)
+  gc()
+
+  # Store first and last rows in list
+  summary_list[[i]] <- bind_rows(result2[1, ], result2[nrow(result2), ])
+
+  # Save cropped file
+  new_filename <- sub("\\.parquet$", "_crop.parquet", basename(parquet_file))
+  arrow::write_parquet(result2, file.path("/Cropped", new_filename))
+  rm(result2)
+  gc()
+
+  cat("Saved:", new_filename, "\n\n")
+}
+
+# Combine all summary rows at the end
+summary_tibble <- bind_rows(summary_list)
+print(summary_tibble)
+```
+
+## Analysis and classifying behaviour
+
+The output is now ready for analysis or classification of behaviour using your own analytical methods or behavioural classifier.
+
+## Identifying high activity periods
+
+`sumVDBA` is the best measure of heat-generating movement or activity:
+```r
+df_mvt |>
+  filter(!is.na(time)) |>
+  ggplot(aes(x = time, y = sumVDBA)) +
+  geom_point(size = 0.2) +
+  theme_classic()
+```
+
+## Benchmarking
+
+We can compare performance of the `fast` (RcppRoll), `base` (pure R), and `orig` (original code) implementations on a real accelerometer file (50,000 rows):
+```r
+bench <-
+  arrow::read_parquet(system.file("extdata", "raw_Pic2Jan_50000.parquet", package = "rabbit")) |>
+  standardise_data(vars = c("Timestamp", "accX", "accY", "accZ"),
+                   time_function = lubridate::dmy_hms) |>
+  dplyr::select(time, x, y, z) |>
   benchmark_movement_dynamics()
 
-bench |> 
-  dplyr::group_by(task, method) |> 
+bench |>
+  dplyr::group_by(task, method) |>
   dplyr::summarise(median_sec = median(elapsed_sec))
 ```
+
+| method | time (seconds) | relative speed |
+|--------|----------------|----------------|
+| fast   | 0.146          | 1,835x faster than orig |
+| base   | 0.983          | 272x faster than orig |
+| orig   | 267.848 (~4.5 minutes) | baseline |
+
+The `fast` method is ~7x faster than the pure R `base` implementation, and ~1,835x faster than the original code. On a full day's recording at 25Hz, this difference becomes even more pronounced, a file that previously took over a day to process can now be done in seconds.
