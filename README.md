@@ -1,645 +1,212 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
-
-<meta charset="utf-8">
-<meta name="generator" content="quarto-1.8.25">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
-
-<title>readme</title>
-<style>
-code{white-space: pre-wrap;}
-span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
-div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-ul.task-list{list-style: none;}
-ul.task-list li input[type="checkbox"] {
-  width: 0.8em;
-  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
-  vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
-</style>
-
-
-<script src="Readme_files/libs/clipboard/clipboard.min.js"></script>
-<script src="Readme_files/libs/quarto-html/quarto.js" type="module"></script>
-<script src="Readme_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="Readme_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
-<script src="Readme_files/libs/quarto-html/popper.min.js"></script>
-<script src="Readme_files/libs/quarto-html/tippy.umd.min.js"></script>
-<script src="Readme_files/libs/quarto-html/anchor.min.js"></script>
-<link href="Readme_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="Readme_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="Readme_files/libs/bootstrap/bootstrap.min.js"></script>
-<link href="Readme_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="Readme_files/libs/bootstrap/bootstrap-d6a003b94517c951b2d65075d42fb01b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
-
-
-</head>
-
-<body class="fullcontent quarto-light">
-
-<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
-<main class="content" id="quarto-document-content">
-
-
-
 
 <!-- README.md is generated from README.Rmd. Please edit that file 
 To regenerate, run `quarto::quarto_render("Readme.Rmd", output_file = "Readme.md")`
 -->
-<section id="rabbit" class="level1">
-<h1>rabbit</h1>
-<!-- badges: start -->
-<p><a href="https://github.com/traitecoevo/rabbit/actions/workflows/R-CMD-check.yml"><img src="https://github.com/traitecoevo/rabbit/actions/workflows/R-CMD-check.yml/badge.svg" class="img-fluid" alt="R-CMD-check"></a> <!-- [![codecov](https://codecov.io/gh/traitecoevo/rabbit/branch/master/graph/badge.svg?token=JT1M0AMZ44)](https://codecov.io/gh/traitecoevo/rabbit) --> <!-- badges: end --></p>
-<p>The package {rabbit} provides functions to standardise raw accelerometer data and extract movement dynamics from it. Accelerometer data is often collected in a raw format that may not be immediately suitable for analysis.</p>
-<p>The <code>standardise_data</code> function reads in raw accelerometer data, standardises the column names, and converts the timestamp to a consistent format.</p>
-<p>The <code>extract_movement_dynamics</code> function takes the standardised data and calculates various movement dynamics metrics, such as mean acceleration, variance, covariance, Overall Dynamic Body Acceleration (ODBA), and Vectorial Dynamic Body Acceleration (VDBA) using rolling window calculations. The data is then returned in a tidy format, ready for further analysis or classification of behaviour.</p>
-<p>Accelerometer data is often collected at high frequencies, resulting in large datasets. The {rabbit} package is designed to efficiently process these large datasets</p>
-<p>The {rabbit} package is designed for efficient rolling window calculations. Compared to the original code ingerited by the team, it is 1000-2000 times faster. This means that processing a file that previously took &gt; 1 day can now be done in just less than a minute. This makes it feasible to process large datasets of accelerometer data in a reasonable time frame. Speed gains are achieved via effective design combined with the use of the <a href="https://cran.r-project.org/web/packages/RcppRoll/index.html">{RcppRoll}</a> package, which provides optimized C++ implementations of rolling window functions. This allows users to quickly extract meaningful movement dynamics metrics from their accelerometer data, even when dealing with extensive recordings.</p>
-<section id="installation" class="level2">
-<h2 class="anchored" data-anchor-id="installation">Installation</h2>
-<p>You can install the development version of <code>rabbit</code> from GitHub using the <code>remotes</code> package:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("remotes")</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"traitecoevo/rabbit"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="example" class="level2">
-<h2 class="anchored" data-anchor-id="example">Example</h2>
-<p>This is a basic example file is less than one hour of a bilby called piccolo:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rabbit)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: package 'dplyr' was built under R version 4.4.3</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     filter, lag</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 4.4.3</span></span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>file_in <span class="ot">=</span> <span class="fu">system.file</span>(<span class="st">"extdata"</span>, <span class="st">"raw_Pic2Jan_50000.parquet"</span>, <span class="at">package =</span> <span class="st">"rabbit"</span>)</span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> </span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">standardise_data</span>(<span class="at">file_in =</span> file_in, <span class="at">vars =</span> <span class="fu">c</span>(<span class="st">"Timestamp"</span>,<span class="st">"accX"</span>,<span class="st">"accY"</span>,<span class="st">"accZ"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_movement_dynamics</span>()</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(df)</span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; [1] 50000</span></span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co"># first rows of data are NA because of rolling window calculations</span></span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(time))</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 49,951 × 28</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    time                meanX  meanY meanZ  maxx   maxy  maxz  minx   miny  minz</span></span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    &lt;dttm&gt;              &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  1 2024-01-03 01:08:16 0.592 -0.317 0.713  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  2 2024-01-03 01:08:17 0.592 -0.317 0.713  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  3 2024-01-03 01:08:17 0.593 -0.317 0.712  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  4 2024-01-03 01:08:17 0.594 -0.317 0.713  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  5 2024-01-03 01:08:17 0.593 -0.317 0.713  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  6 2024-01-03 01:08:17 0.592 -0.317 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  7 2024-01-03 01:08:17 0.592 -0.317 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  8 2024-01-03 01:08:17 0.592 -0.316 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  9 2024-01-03 01:08:17 0.592 -0.316 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10 2024-01-03 01:08:17 0.592 -0.316 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ℹ 49,941 more rows</span></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ℹ 18 more variables: sdx &lt;dbl&gt;, sdy &lt;dbl&gt;, sdz &lt;dbl&gt;, SMA &lt;dbl&gt;,</span></span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   minODBA &lt;dbl&gt;, maxODBA &lt;dbl&gt;, minVDBA &lt;dbl&gt;, maxVDBA &lt;dbl&gt;, sumODBA &lt;dbl&gt;,</span></span>
-<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   sumVDBA &lt;dbl&gt;, meanODBA &lt;dbl&gt;, meanVDBA &lt;dbl&gt;, corXY &lt;dbl&gt;, corXZ &lt;dbl&gt;,</span></span>
-<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   corYZ &lt;dbl&gt;, skx &lt;dbl&gt;, sky &lt;dbl&gt;, skz &lt;dbl&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p>Alternatively, you can read in the data and then standardise it:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(arrow)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning: package 'arrow' was built under R version 4.4.3</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Attaching package: 'arrow'</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; The following object is masked from 'package:utils':</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;     timestamp</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> arrow<span class="sc">::</span><span class="fu">read_parquet</span>(file_in)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>df_std <span class="ot">&lt;-</span> <span class="fu">standardise_data</span>(df, <span class="at">vars =</span> <span class="fu">c</span>(<span class="st">"Timestamp"</span>,<span class="st">"accX"</span>,<span class="st">"accY"</span>,<span class="st">"accZ"</span>))</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>df_mvt <span class="ot">&lt;-</span> <span class="fu">extract_movement_dynamics</span>(df_std)</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>df_mvt <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(time))</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 49,951 × 28</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    time                meanX  meanY meanZ  maxx   maxy  maxz  minx   miny  minz</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    &lt;dttm&gt;              &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  1 2024-01-03 01:08:16 0.592 -0.317 0.713  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  2 2024-01-03 01:08:17 0.592 -0.317 0.713  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  3 2024-01-03 01:08:17 0.593 -0.317 0.712  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  4 2024-01-03 01:08:17 0.594 -0.317 0.713  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  5 2024-01-03 01:08:17 0.593 -0.317 0.713  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  6 2024-01-03 01:08:17 0.592 -0.317 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  7 2024-01-03 01:08:17 0.592 -0.317 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  8 2024-01-03 01:08:17 0.592 -0.316 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;  9 2024-01-03 01:08:17 0.592 -0.316 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 10 2024-01-03 01:08:17 0.592 -0.316 0.714  0.61 -0.297 0.735 0.563 -0.328 0.688</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ℹ 49,941 more rows</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # ℹ 18 more variables: sdx &lt;dbl&gt;, sdy &lt;dbl&gt;, sdz &lt;dbl&gt;, SMA &lt;dbl&gt;,</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   minODBA &lt;dbl&gt;, maxODBA &lt;dbl&gt;, minVDBA &lt;dbl&gt;, maxVDBA &lt;dbl&gt;, sumODBA &lt;dbl&gt;,</span></span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   sumVDBA &lt;dbl&gt;, meanODBA &lt;dbl&gt;, meanVDBA &lt;dbl&gt;, corXY &lt;dbl&gt;, corXZ &lt;dbl&gt;,</span></span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; #   corYZ &lt;dbl&gt;, skx &lt;dbl&gt;, sky &lt;dbl&gt;, skz &lt;dbl&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="classifying-behaviour" class="level2">
-<h2 class="anchored" data-anchor-id="classifying-behaviour">Classifying behaviour</h2>
-<p>Data is now ready for classification of behaviour using your own behavioural classifier.</p>
-</section>
-<section id="identifying-high-sumvdba-times" class="level2">
-<h2 class="anchored" data-anchor-id="identifying-high-sumvdba-times">Identifying high sumVDBA times</h2>
-<p>sumVDBA is the best measure we have of heat-generating movement or activities:</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_mvt <span class="sc">|&gt;</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(time)) <span class="sc">|&gt;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> time, <span class="at">y =</span> sumVDBA)) <span class="sc">+</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="fl">0.2</span>) <span class="sc">+</span> <span class="fu">theme_classic</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="man/figures/README-unnamed-chunk-3-1.png" class="img-fluid figure-img" style="width:100.0%"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="benchmarking-speed-gains" class="level2">
-<h2 class="anchored" data-anchor-id="benchmarking-speed-gains">Benchmarking speed gains</h2>
-<p>Compared to the original code ingerited by the team, the {rabbit} package is 1000-2000 times faster. This means that processing a file that previously took &gt; 1 day can now be done in just less than a minute. Much of this gain is via efficient design, but the use of the <a href="https://cran.r-project.org/web/packages/RcppRoll/index.html">{RcppRoll}</a> package also contributes to speed gains. The {RcppRoll} implementation is about 10-20 times faster than a pure R implementation of rolling sums.</p>
-<p>We can compare performance of the <code>fast</code> (RcppRoll) <code>base</code> (pure R), and <code>orig</code> (original code) implementations for extracting movement dynamics.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>bench <span class="ot">&lt;-</span> </span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">generate_fake_data</span>(<span class="at">n =</span> <span class="dv">1000</span>) <span class="sc">|&gt;</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">standardise_data</span>(<span class="at">vars =</span> <span class="fu">c</span>(<span class="st">"timestamp"</span>, <span class="st">"accX"</span>, <span class="st">"accY"</span>, <span class="st">"accZ"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">benchmark_movement_dynamics</span>()</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>bench <span class="sc">|&gt;</span> </span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(task, method) <span class="sc">|&gt;</span> </span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">summarise</span>(<span class="at">median_sec =</span> <span class="fu">median</span>(elapsed_sec))</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; `summarise()` has regrouped the output.</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Summaries were computed grouped by task and method.</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Output is grouped by task.</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Use `summarise(.groups = "drop_last")` to silence this message.</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; ℹ Use `summarise(.by = c(task, method))` for per-operation grouping</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   (`?dplyr::dplyr_by`) instead.</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # A tibble: 3 × 3</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; # Groups:   task [1]</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   task                      method median_sec</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;                     &lt;fct&gt;       &lt;dbl&gt;</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1 extract_movement_dynamics fast      0.00400</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2 extract_movement_dynamics base      0.0110 </span></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3 extract_movement_dynamics orig      1.93</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-</section>
 
-</main>
-<!-- /main column -->
-<script id="quarto-html-after-body" type="application/javascript">
-  window.document.addEventListener("DOMContentLoaded", function (event) {
-    const icon = "";
-    const anchorJS = new window.AnchorJS();
-    anchorJS.options = {
-      placement: 'right',
-      icon: icon
-    };
-    anchorJS.add('.anchored');
-    const isCodeAnnotation = (el) => {
-      for (const clz of el.classList) {
-        if (clz.startsWith('code-annotation-')) {                     
-          return true;
-        }
-      }
-      return false;
-    }
-    const onCopySuccess = function(e) {
-      // button target
-      const button = e.trigger;
-      // don't keep focus
-      button.blur();
-      // flash "checked"
-      button.classList.add('code-copy-button-checked');
-      var currentTitle = button.getAttribute("title");
-      button.setAttribute("title", "Copied!");
-      let tooltip;
-      if (window.bootstrap) {
-        button.setAttribute("data-bs-toggle", "tooltip");
-        button.setAttribute("data-bs-placement", "left");
-        button.setAttribute("data-bs-title", "Copied!");
-        tooltip = new bootstrap.Tooltip(button, 
-          { trigger: "manual", 
-            customClass: "code-copy-button-tooltip",
-            offset: [0, -8]});
-        tooltip.show();    
-      }
-      setTimeout(function() {
-        if (tooltip) {
-          tooltip.hide();
-          button.removeAttribute("data-bs-title");
-          button.removeAttribute("data-bs-toggle");
-          button.removeAttribute("data-bs-placement");
-        }
-        button.setAttribute("title", currentTitle);
-        button.classList.remove('code-copy-button-checked');
-      }, 1000);
-      // clear code selection
-      e.clearSelection();
-    }
-    const getTextToCopy = function(trigger) {
-      const outerScaffold = trigger.parentElement.cloneNode(true);
-      const codeEl = outerScaffold.querySelector('code');
-      for (const childEl of codeEl.children) {
-        if (isCodeAnnotation(childEl)) {
-          childEl.remove();
-        }
-      }
-      return codeEl.innerText;
-    }
-    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-      text: getTextToCopy
-    });
-    clipboard.on('success', onCopySuccess);
-    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-        text: getTextToCopy,
-        container: window.document.getElementById('quarto-embedded-source-code-modal')
-      });
-      clipboardModal.on('success', onCopySuccess);
-    }
-      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-      var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
-      var isInternal = (href) => {
-          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
-      }
-      // Inspect non-navigation links and adorn them if external
-     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-      for (var i=0; i<links.length; i++) {
-        const link = links[i];
-        if (!isInternal(link.href)) {
-          // undo the damage that might have been done by quarto-nav.js in the case of
-          // links that we want to consider external
-          if (link.dataset.originalHref !== undefined) {
-            link.href = link.dataset.originalHref;
-          }
-        }
-      }
-    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-      const config = {
-        allowHTML: true,
-        maxWidth: 500,
-        delay: 100,
-        arrow: false,
-        appendTo: function(el) {
-            return el.parentElement;
-        },
-        interactive: true,
-        interactiveBorder: 10,
-        theme: 'quarto',
-        placement: 'bottom-start',
-      };
-      if (contentFn) {
-        config.content = contentFn;
-      }
-      if (onTriggerFn) {
-        config.onTrigger = onTriggerFn;
-      }
-      if (onUntriggerFn) {
-        config.onUntrigger = onUntriggerFn;
-      }
-      window.tippy(el, config); 
-    }
-    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-    for (var i=0; i<noterefs.length; i++) {
-      const ref = noterefs[i];
-      tippyHover(ref, function() {
-        // use id or data attribute instead here
-        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-        try { href = new URL(href).hash; } catch {}
-        const id = href.replace(/^#\/?/, "");
-        const note = window.document.getElementById(id);
-        if (note) {
-          return note.innerHTML;
-        } else {
-          return "";
-        }
-      });
-    }
-    const xrefs = window.document.querySelectorAll('a.quarto-xref');
-    const processXRef = (id, note) => {
-      // Strip column container classes
-      const stripColumnClz = (el) => {
-        el.classList.remove("page-full", "page-columns");
-        if (el.children) {
-          for (const child of el.children) {
-            stripColumnClz(child);
-          }
-        }
-      }
-      stripColumnClz(note)
-      if (id === null || id.startsWith('sec-')) {
-        // Special case sections, only their first couple elements
-        const container = document.createElement("div");
-        if (note.children && note.children.length > 2) {
-          container.appendChild(note.children[0].cloneNode(true));
-          for (let i = 1; i < note.children.length; i++) {
-            const child = note.children[i];
-            if (child.tagName === "P" && child.innerText === "") {
-              continue;
-            } else {
-              container.appendChild(child.cloneNode(true));
-              break;
-            }
-          }
-          if (window.Quarto?.typesetMath) {
-            window.Quarto.typesetMath(container);
-          }
-          return container.innerHTML
-        } else {
-          if (window.Quarto?.typesetMath) {
-            window.Quarto.typesetMath(note);
-          }
-          return note.innerHTML;
-        }
-      } else {
-        // Remove any anchor links if they are present
-        const anchorLink = note.querySelector('a.anchorjs-link');
-        if (anchorLink) {
-          anchorLink.remove();
-        }
-        if (window.Quarto?.typesetMath) {
-          window.Quarto.typesetMath(note);
-        }
-        if (note.classList.contains("callout")) {
-          return note.outerHTML;
-        } else {
-          return note.innerHTML;
-        }
-      }
-    }
-    for (var i=0; i<xrefs.length; i++) {
-      const xref = xrefs[i];
-      tippyHover(xref, undefined, function(instance) {
-        instance.disable();
-        let url = xref.getAttribute('href');
-        let hash = undefined; 
-        if (url.startsWith('#')) {
-          hash = url;
-        } else {
-          try { hash = new URL(url).hash; } catch {}
-        }
-        if (hash) {
-          const id = hash.replace(/^#\/?/, "");
-          const note = window.document.getElementById(id);
-          if (note !== null) {
-            try {
-              const html = processXRef(id, note.cloneNode(true));
-              instance.setContent(html);
-            } finally {
-              instance.enable();
-              instance.show();
-            }
-          } else {
-            // See if we can fetch this
-            fetch(url.split('#')[0])
-            .then(res => res.text())
-            .then(html => {
-              const parser = new DOMParser();
-              const htmlDoc = parser.parseFromString(html, "text/html");
-              const note = htmlDoc.getElementById(id);
-              if (note !== null) {
-                const html = processXRef(id, note);
-                instance.setContent(html);
-              } 
-            }).finally(() => {
-              instance.enable();
-              instance.show();
-            });
-          }
-        } else {
-          // See if we can fetch a full url (with no hash to target)
-          // This is a special case and we should probably do some content thinning / targeting
-          fetch(url)
-          .then(res => res.text())
-          .then(html => {
-            const parser = new DOMParser();
-            const htmlDoc = parser.parseFromString(html, "text/html");
-            const note = htmlDoc.querySelector('main.content');
-            if (note !== null) {
-              // This should only happen for chapter cross references
-              // (since there is no id in the URL)
-              // remove the first header
-              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
-                note.children[0].remove();
-              }
-              const html = processXRef(null, note);
-              instance.setContent(html);
-            } 
-          }).finally(() => {
-            instance.enable();
-            instance.show();
-          });
-        }
-      }, function(instance) {
-      });
-    }
-        let selectedAnnoteEl;
-        const selectorForAnnotation = ( cell, annotation) => {
-          let cellAttr = 'data-code-cell="' + cell + '"';
-          let lineAttr = 'data-code-annotation="' +  annotation + '"';
-          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
-          return selector;
-        }
-        const selectCodeLines = (annoteEl) => {
-          const doc = window.document;
-          const targetCell = annoteEl.getAttribute("data-target-cell");
-          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
-          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
-          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
-          const lineIds = lines.map((line) => {
-            return targetCell + "-" + line;
-          })
-          let top = null;
-          let height = null;
-          let parent = null;
-          if (lineIds.length > 0) {
-              //compute the position of the single el (top and bottom and make a div)
-              const el = window.document.getElementById(lineIds[0]);
-              top = el.offsetTop;
-              height = el.offsetHeight;
-              parent = el.parentElement.parentElement;
-            if (lineIds.length > 1) {
-              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
-              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
-              height = bottom - top;
-            }
-            if (top !== null && height !== null && parent !== null) {
-              // cook up a div (if necessary) and position it 
-              let div = window.document.getElementById("code-annotation-line-highlight");
-              if (div === null) {
-                div = window.document.createElement("div");
-                div.setAttribute("id", "code-annotation-line-highlight");
-                div.style.position = 'absolute';
-                parent.appendChild(div);
-              }
-              div.style.top = top - 2 + "px";
-              div.style.height = height + 4 + "px";
-              div.style.left = 0;
-              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
-              if (gutterDiv === null) {
-                gutterDiv = window.document.createElement("div");
-                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
-                gutterDiv.style.position = 'absolute';
-                const codeCell = window.document.getElementById(targetCell);
-                const gutter = codeCell.querySelector('.code-annotation-gutter');
-                gutter.appendChild(gutterDiv);
-              }
-              gutterDiv.style.top = top - 2 + "px";
-              gutterDiv.style.height = height + 4 + "px";
-            }
-            selectedAnnoteEl = annoteEl;
-          }
-        };
-        const unselectCodeLines = () => {
-          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
-          elementsIds.forEach((elId) => {
-            const div = window.document.getElementById(elId);
-            if (div) {
-              div.remove();
-            }
-          });
-          selectedAnnoteEl = undefined;
-        };
-          // Handle positioning of the toggle
-      window.addEventListener(
-        "resize",
-        throttle(() => {
-          elRect = undefined;
-          if (selectedAnnoteEl) {
-            selectCodeLines(selectedAnnoteEl);
-          }
-        }, 10)
-      );
-      function throttle(fn, ms) {
-      let throttle = false;
-      let timer;
-        return (...args) => {
-          if(!throttle) { // first call gets through
-              fn.apply(this, args);
-              throttle = true;
-          } else { // all the others get throttled
-              if(timer) clearTimeout(timer); // cancel #2
-              timer = setTimeout(() => {
-                fn.apply(this, args);
-                timer = throttle = false;
-              }, ms);
-          }
-        };
-      }
-        // Attach click handler to the DT
-        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
-        for (const annoteDlNode of annoteDls) {
-          annoteDlNode.addEventListener('click', (event) => {
-            const clickedEl = event.target;
-            if (clickedEl !== selectedAnnoteEl) {
-              unselectCodeLines();
-              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
-              if (activeEl) {
-                activeEl.classList.remove('code-annotation-active');
-              }
-              selectCodeLines(clickedEl);
-              clickedEl.classList.add('code-annotation-active');
-            } else {
-              // Unselect the line
-              unselectCodeLines();
-              clickedEl.classList.remove('code-annotation-active');
-            }
-          });
-        }
-    const findCites = (el) => {
-      const parentEl = el.parentElement;
-      if (parentEl) {
-        const cites = parentEl.dataset.cites;
-        if (cites) {
-          return {
-            el,
-            cites: cites.split(' ')
-          };
-        } else {
-          return findCites(el.parentElement)
-        }
-      } else {
-        return undefined;
-      }
-    };
-    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-    for (var i=0; i<bibliorefs.length; i++) {
-      const ref = bibliorefs[i];
-      const citeInfo = findCites(ref);
-      if (citeInfo) {
-        tippyHover(citeInfo.el, function() {
-          var popup = window.document.createElement('div');
-          citeInfo.cites.forEach(function(cite) {
-            var citeDiv = window.document.createElement('div');
-            citeDiv.classList.add('hanging-indent');
-            citeDiv.classList.add('csl-entry');
-            var biblioDiv = window.document.getElementById('ref-' + cite);
-            if (biblioDiv) {
-              citeDiv.innerHTML = biblioDiv.innerHTML;
-            }
-            popup.appendChild(citeDiv);
-          });
-          return popup.innerHTML;
-        });
-      }
-    }
-  });
-  </script>
-</div> <!-- /content -->
+# rabbit <img src="man/figures/logo.png" align="right" height="139"/>
 
+The `{rabbit}` package provides functions to standardise raw tri-axial
+accelerometer data and extract movement dynamic metrics from it.
+Accelerometer data is often collected in a raw format that may not be
+immediately suitable for analysis.
 
+- `standardise_data()` reads in raw accelerometer data, standardises
+  column names, and converts the timestamp to a consistent format.
+- `extract_movement_dynamics()` takes the standardised data and
+  calculates various movement dynamics metrics using rolling window
+  calculations, including mean acceleration, variance, covariance,
+  Overall Dynamic Body Acceleration (ODBA), and Vectorial Dynamic Body
+  Acceleration (VDBA).
+- `crop_ends()`, `crop_ends_diurnal()`, and
+  `crop_ends_nocturnal()`useful for removing records that are outside of
+  the desired time window, such as records collected before the device
+  was fitted or after it was removed.
 
+## Speed
 
-</body></html>
+Accelerometer data is often collected at high frequencies, usually 10 to
+50Hz, resulting in large datasets. Compared to the original code
+inherited by the team, `{rabbit}` is **1000–2000 times faster**. A file
+that previously took over a day to process can now be done in under a
+minute. Speed gains come from efficient design combined with the
+`{RcppRoll}` package, which provides optimised C++ implementations of
+rolling window functions.
+
+## Installation
+
+You can install the development version of `rabbit` from GitHub using
+the `remotes` package:
+
+``` r
+# install.packages("remotes")
+remotes::install_github("traitecoevo/rabbit")
+```
+
+## Example
+
+This basic example uses less than one hour of data from a bilby called
+Piccolo:
+
+``` r
+library(rabbit)
+library(dplyr)
+
+file_in <- system.file("extdata", "raw_Pic2Jan_50000.parquet", package = "rabbit")
+
+df <- standardise_data(file_in = file_in, vars = c("Timestamp", "accX", "accY", "accZ")) |>
+  extract_movement_dynamics()
+
+# First rows are NA due to rolling window calculations
+df |> filter(!is.na(time))
+```
+
+Alternatively, you can read in the data first and then standardise it:
+
+``` r
+library(arrow)
+
+df <- arrow::read_parquet(file_in)
+
+df_mvt <- standardise_data(df, vars = c("Timestamp", "accX", "accY", "accZ")) |>
+  extract_movement_dynamics()
+
+df_mvt |> filter(!is.na(time))
+```
+
+The following code loops through all files within a folder and extracts
+the animal ID from the file name using the `{stringr}` package. For ID
+extraction, files should be labelled with the animal ID followed by `_`.
+
+``` r
+library(stringr)
+library(arrow)
+
+csv_files <- list.files(path = "/Raw", pattern = "*.csv", full.names = TRUE)
+
+# Create output folder if it doesn't exist
+dir.create("/Processed", showWarnings = FALSE)
+
+# Loop through each .csv file, calculate, and save the results
+for (csv_file in csv_files) {
+  cat("Processing:", csv_file, "\n")
+
+  # Extract ID from filename
+  file_name <- tools::file_path_sans_ext(basename(csv_file))
+  animal_id <- stringr::str_split(file_name, "_")[[1]][1]
+
+  result <- standardise_data(file_in = csv_file,
+                             vars = c("Timestamp", "X", "Y", "Z"),
+                             time_function = lubridate::dmy_hms) |>
+    extract_movement_dynamics(window_size = 25)
+
+  result$ID <- animal_id
+  result <- dplyr::relocate(result, ID)
+
+  output_file <- sub("Raw", "Processed", csv_file) |>
+    sub(pattern = "\\.csv$", replacement = ".parquet")
+
+  arrow::write_parquet(result, output_file)
+
+  cat("Saved:", output_file, "\n\n")
+  gc()
+}
+```
+
+Files can then be cropped to remove records at the start and end of each
+file. This is useful for removing records collected before the device
+was attached or after it was removed.
+
+- `crop_ends()` removes all records before the first instance of a
+  specified time and after the last instance of a specified time
+- `crop_ends_diurnal()` removes all records before the first instance of
+  01:00:00 and after the last instance of 01:00:00
+- `crop_ends_nocturnal()` removes all records before the first instance
+  of 12:00:00 and after the last instance of 12:00:00
+
+``` r
+# List all .parquet files in folder
+parquet_files <- list.files(path = "/Processed", pattern = "\\.parquet$", full.names = TRUE)
+
+# Create output folder if it doesn't exist
+dir.create("/Cropped", showWarnings = FALSE)
+
+# Create an empty list to collect summary rows
+summary_list <- vector("list", length(parquet_files))
+
+for (i in seq_along(parquet_files)) {
+
+  parquet_file <- parquet_files[i]
+  cat("Processing:", parquet_file, "\n")
+
+  # Load and remove incomplete time rows
+  df <- arrow::read_parquet(parquet_file) |>
+    filter(!is.na(time))
+
+  # Crop each file with desired crop_ends() function
+  result2 <- crop_ends_nocturnal(df)
+  rm(df)
+  gc()
+
+  # Store first and last rows in list
+  summary_list[[i]] <- bind_rows(result2[1, ], result2[nrow(result2), ])
+
+  # Save cropped file
+  new_filename <- sub("\\.parquet$", "_crop.parquet", basename(parquet_file))
+  arrow::write_parquet(result2, file.path("/Cropped", new_filename))
+  rm(result2)
+  gc()
+
+  cat("Saved:", new_filename, "\n\n")
+}
+
+# Combine all summary rows at the end
+summary_tibble <- bind_rows(summary_list)
+print(summary_tibble)
+```
+
+## Analysis and classifying behaviour
+
+The output is now ready for analysis or classification of behaviour
+using your own analytical methods or behavioural classifier.
+
+## Identifying high activity periods
+
+`sumVDBA` is the best measure of heat-generating movement or activity:
+
+``` r
+df_mvt |>
+  filter(!is.na(time)) |>
+  ggplot(aes(x = time, y = sumVDBA)) +
+  geom_point(size = 0.2) +
+  theme_classic()
+```
+
+## Benchmarking
+
+We can compare performance of the `fast` (RcppRoll), `base` (pure R),
+and `orig` (original code) implementations on a real accelerometer file
+(50,000 rows):
+
+``` r
+bench <-
+  arrow::read_parquet(system.file("extdata", "raw_Pic2Jan_50000.parquet", package = "rabbit")) |>
+  standardise_data(vars = c("Timestamp", "accX", "accY", "accZ"),
+                   time_function = lubridate::dmy_hms) |>
+  dplyr::select(time, x, y, z) |>
+  benchmark_movement_dynamics()
+
+bench |>
+  dplyr::group_by(task, method) |>
+  dplyr::summarise(median_sec = median(elapsed_sec))
+```
+
+| method | time (seconds)         | relative speed          |
+|--------|------------------------|-------------------------|
+| fast   | 0.146                  | 1,835x faster than orig |
+| base   | 0.983                  | 272x faster than orig   |
+| orig   | 267.848 (~4.5 minutes) | baseline                |
+
+The `fast` method is ~7x faster than the pure R `base` implementation,
+and ~1,835x faster than the original code. On a full day’s recording at
+25Hz, this difference becomes even more pronounced, a file that
+previously took over a day to process can now be done in seconds.
