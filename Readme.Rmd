@@ -83,7 +83,9 @@ for (csv_file in csv_files) {
 
   result <- standardise_data(file_in = csv_file,
                              vars = c("Timestamp", "X", "Y", "Z"),
-                             time_function = lubridate::dmy_hms) |>
+                             time_function = lubridate::dmy_hms,
+                             timezone = "UTC",
+                             output_timezone = "Australia/Adelaide") |>
     extract_movement_dynamics(window_size = 25)
 
   result$ID <- animal_id
