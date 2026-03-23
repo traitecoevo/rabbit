@@ -5,7 +5,8 @@
 #' @param df A data frame containing the data
 #' @param file_in A string representing the path to the input file (CSV or parquet).
 #' @param vars A character vector of length 4 specifying the names of the columns in df that contain the variables `time`, `X`, `Y`, `Z` from the  accelerometer. The default is c("Timestamp","X","Y","Z").
-#' @param timezone Timezone of where accelerometer was used
+#' @param timezone Timezone data is stored in
+#' @param output_timezone Timezone to convert to, where data were collected
 #' @param time_function A function to convert the time column to POSIXct. The default is lubridate::dmy_hms, which parses date-times with year, month, and day, hour, minute, and second components.
 #' @param ... Other arguments to pass into read in function
 #' @rdname standardise_data 
@@ -19,7 +20,8 @@ standardise_data <- function(df,
                                 file_in = NULL,
                                 vars = c("Timestamp","X","Y","Z"), 
                                 time_function = lubridate::dmy_hms,
-                                timezone="Australia/Adelaide", 
+                                timezone="UTC",
+                                output_timezone="Australia/Adelaide", 
                                 ...) {
 
   # Read in the CSV file
@@ -60,9 +62,13 @@ standardise_data <- function(df,
     ))
   )
 
-  # Convert the date column to POSIXct (date-time) type using lubridate
+  # Convert the timestamp to POSIXct using the specified input timezone
   if(!lubridate::is.POSIXct(df$time)) {
     df$time <- time_function(df$time, tz = timezone)
+  }
+    # Convert to output timezone 
+  if(!is.null(output_timezone)) {
+    df$time <- lubridate::with_tz(df$time, tzone = output_timezone)
   }
 
   # Check if there are any NA values after conversion
