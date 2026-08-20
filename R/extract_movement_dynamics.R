@@ -5,6 +5,8 @@
 #' @param df A data frame containing the data.
 #' @param window_size An integer specifying the size of the rolling window.
 #' @param method A string specifying the method to use for rolling calculations. Options are "fast" (using RcppRoll) or "base" (using pure R implementations). The default is "fast".
+#' @param separate_gravity If TRUE (the default), a rolling-window estimate of static (gravitational) acceleration is subtracted from the raw signal before computing ODBA and VDBA, so that these reflect dynamic body acceleration, and do not carry a resting-state floor from gravity. If FALSE, ODBA and VDBA are computed on raw acceleration. All other metrics (means, variances, covariances, skewness) are always computed on raw acceleration regardless of this setting, since those legitimately reflect device/animal orientation.
+#' @param static_window An integer specifying the rolling window (in samples) used to estimate static/gravitational acceleration when 'separate_gravity = TRUE'. 
 #' @return A data frame with movement dynamics metrics calculated across the sliding window.
 #' @rdname extract_movement_dynamics
 #' @export
@@ -14,7 +16,7 @@
 #' df <-
 #'   standardize_data(file_in = file_in, vars = c("Timestamp", "accX", "accY", "accZ")) |>
 #'   extract_movement_dynamics()
-extract_movement_dynamics <- function(df, window_size=50, method = c("fast", "base")) {
+extract_movement_dynamics <- function(df, window_size=50, method = c("fast", "base"), separate_gravity=TRUE, static_window=50) {
 
   method <- match.arg(method)
 
@@ -23,6 +25,20 @@ extract_movement_dynamics <- function(df, window_size=50, method = c("fast", "ba
   x <- df$x
   y <- df$y
   z <- df$z
+
+  if (separate_gravity) {
+    static_x <- roll_mean(x, static_window, method = method)
+    static_y <- roll_mean(y, static_window, method = method)
+    static_z <- roll_mean(z, static_window, method = method)
+    
+    dynamic_x <- x - static_x
+    dynamic_y <- y - static_y
+    dynamic_z <- z - static_z
+  } else {
+    dynamic_x <- x
+    dynamic_y <- y
+    dynamic_z <- z
+  }
 
   abs_x <- abs(x)
   abs_y <- abs(y)
@@ -48,8 +64,8 @@ extract_movement_dynamics <- function(df, window_size=50, method = c("fast", "ba
   cov_yz <- (roll_sum(y * z, n, method = method[1]) - n * mean_y * mean_z) / n
    
   # Calculate Overall Dynamic Body Acceleration (ODBA) and Vectorial Dynmic Body Acceleration (VDBA)
-  ODBA = abs_x + abs_y + abs_z
-  VDBA = sqrt(x_2 + y_2 + z_2)
+  ODBA = abs(dynamic_x) + abs(dynamic_y) + abs(dynamic_z)
+  VDBA = sqrt(dynamic_x^2 + dynamic_y^2 + dynamic_z^2)
   
   out <- 
     dplyr::tibble(
